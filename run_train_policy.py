@@ -127,7 +127,7 @@ def main():
         n_cores = int(os.environ["SLURM_JOB_CPUS_PER_NODE"])
         cluster = "cluster"
     except:
-        n_cores = 2
+        n_cores = 20
         cluster = "local"
     print(f"Using {n_cores} cores on {cluster}")
 
@@ -155,7 +155,7 @@ def main():
         "l2": 0.01,
     }
     selfplay_params = {
-        "rounds_per_step": 2,  # amount of selfplay rounds per step
+        "rounds_per_step": 40,  # amount of selfplay rounds per step
         "max_memory_multiplier": 10,  # memory size = rounds_per_step * 36 * max_memory_multiplier
         "extra_noise_ratio": 0.1,  # when training extra_noise_ratio * mcts_steps is added to all visit counts
         "mcts_params": {
@@ -172,7 +172,7 @@ def main():
     }
     test_params = {
         "test_rounds": 10000,
-        "test_frequency":5,
+        "test_frequency":40,
         "mcts_params": {
             "mcts_steps": 10,
             "n_of_sims": 0,
