@@ -70,10 +70,12 @@ class MCTS_Node:
         all_cards_legal = np.in1d(all_cards, moves).astype(int)
         dic = dict(zip(all_cards, prob_distr))
         prob_distr_legal = [0 if x not in dic else dic[x] for x in moves]
-        try:
+        nullen = [0] * len(prob_distr_legal)
+        if prob_distr_legal == nullen:
+            probabilities_legal = nullen
+        else:
             probabilities_legal = prob_distr_legal / np.linalg.norm(prob_distr_legal)
-        except: 
-            probabilities_legal = [0] * len(prob_distr_legal)
+
         if self.root:
             probabilities_legal = probabilities_legal #TODO TODO TODO TODO TODO DIRICHLET
         child_prob = dict(zip(moves, probabilities_legal))
