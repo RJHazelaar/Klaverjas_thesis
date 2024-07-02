@@ -89,7 +89,7 @@ class Round:
         deck = Deck()
         deck.shuffle()
         self.player_hands = [deck.cards[0:8], deck.cards[8:16], deck.cards[16:24], deck.cards[24:32]]
-        
+
     def set_cards(self, cards: list[str]):
         # self.player_hands = cards
         self.player_hands = [[], [], [], []]

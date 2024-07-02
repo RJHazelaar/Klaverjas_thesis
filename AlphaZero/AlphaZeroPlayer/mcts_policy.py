@@ -19,7 +19,7 @@ class MCTS_Node:
         self.score = 0
         self.visits = 0
         self.own_team = own_team
-        self.q_min = 0
+        self.q_min = -162
         self.q_max = 162
         self.root = root
 
@@ -47,8 +47,8 @@ class MCTS_Node:
     def update_max_score(self, score):
         if score > self.q_max:
             self.q_max = score
-        #elif score < self.q_min: score always above zero
-        #    self.q_min = score
+        elif score < self.q_min:
+            self.q_min = score
 
     def normalized_score(self, score):
         return (2 * (score - self.q_min)) / (self.q_max - self.q_min) - 1
@@ -97,7 +97,7 @@ class MCTS_Node:
             else:
                 child = children_dict[move]
                 return_nodes.append(child)
-                if self.own_team:
+                if self.own_team: #TODO Deze werkt ook niet
                     ucbs.append(self.normalized_score(child.score / child.visits) + c * (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)))
                 else:
                     ucbs.append(-self.normalized_score(child.score / child.visits) + c * (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)))
@@ -268,9 +268,10 @@ class MCTS:
             now = time.time()
             # Expansion
             if not current_state.round_complete():
-                new_node = current_node.expand(new_node_move)
+                current_state.do_move(new_node_move, "mcts_move")
+                new_node = current_node.expand(new_node_move, current_state.current_player % 2)
                 current_node = new_node
-                current_state.do_move(current_node.move, "mcts_move")
+
 
             self.tijden[2] += time.time() - now
             now = time.time()

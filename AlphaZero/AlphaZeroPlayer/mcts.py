@@ -44,10 +44,10 @@ class MCTS_Node:
         ucbs = []
         legal_children = [child for child in self.children if child.move in self.legal_moves]
 
-        print("WAAALUIGI")
-        print(self.legal_moves)
-        print(self.children)
-        print(self.children_moves)
+        #print("WAAALUIGI")
+        #print(self.legal_moves)
+        #print(self.children)
+        #print(self.children_moves)
 
         for child in legal_children:
             if child.visits == 0:

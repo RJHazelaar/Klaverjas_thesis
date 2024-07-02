@@ -34,7 +34,8 @@ def main():
     alpha_player_3 = AlphaZero_player(3, mcts_params, model)
     random.seed(0)
     while input("New Game? (y/n)") == "y":
-        round = Round(random.choice([0, 1, 2, 3]), "s", random.choice([0, 1, 2, 3]))
+        round = Round(random.choice([0, 1, 2, 3]), "h", random.choice([0, 1, 2, 3]))
+        print(round.trump_suit)
 
         alpha_player_1.new_round_Round(round)
         alpha_player_2.new_round_Round(round)
@@ -46,6 +47,7 @@ def main():
         print("player 3 hand: ", alpha_player_3.state.hands)
         print("main LOOP2")
         for trick in range(8):
+            print("NEW TRICK")
             for j in range(4):
                 current_player = round.current_player
                 moves = round.legal_moves()
@@ -71,8 +73,6 @@ def main():
                         break
                 if not found:
                     raise Exception("move not found")
-
-                print(played_card)
 
                 round.play_card(played_card)
                 move = Card(card_transform(played_card.id, ["k", "h", "r", "s"].index(round.trump_suit)))
