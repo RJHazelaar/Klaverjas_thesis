@@ -268,6 +268,7 @@ class MCTS:
 
             self.tijden[3] += time.time() - now
             now = time.time()
+            print(current_state.to_nparray())
             # Backpropagation
             while current_node.parent is not None:
                 current_node.visits += 1
