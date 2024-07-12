@@ -34,7 +34,8 @@ def main():
     alpha_player_3 = AlphaZero_player(3, mcts_params, model)
     random.seed(0)
     while input("New Game? (y/n)") == "y":
-        round = Round(random.choice([0, 1, 2, 3]), "h", random.choice([0, 1, 2, 3]))
+        round = Round(random.choice([0, 1, 2, 3]), "k", random.choice([0, 1, 2, 3]))
+        print(round.starting_player)
         print(round.trump_suit)
 
         alpha_player_1.new_round_Round(round)

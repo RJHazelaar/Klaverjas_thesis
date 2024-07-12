@@ -249,6 +249,7 @@ class MCTS:
                 if self.n_of_sims > 0:
                     sim_score /= self.n_of_sims
 
+
                 if self.model is not None:
                     now2 = time.time()
                     stat = current_state.to_nparray()
