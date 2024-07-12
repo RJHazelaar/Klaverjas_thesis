@@ -184,7 +184,7 @@ def train(
         train_nn(train_data, model, fit_params, [early_stopping])
         training_time = time.time() - tijd
         model_path = f"{model_name}/{model_name}_{step}.h5"
-        if step == 120:
+        if step == 180:
             tf.keras.backend.set_value(
                 model.optimizer.learning_rate,
                 tf.keras.backend.get_value(model.optimizer.learning_rate) / 10,
