@@ -578,10 +578,16 @@ class State:
         card_location = np.zeros((32, 9), dtype=np.float16)  # 32 cards, 9 possible locations by one of the 4
         # players in one of the 4 centre positions or already played
         now = time.time()
+
+        #own_hand_as_id = [
+        #    card_transform(card.id, ["k", "h", "r", "s"].index(round.trump_suit))
+        #    for card in round.player_hands[self.own_position]
+        #]
+
         # Set the locations of the cards in the hands
         for index, cards in enumerate(determinization):
-            for card in cards:
-                card_transform(card, self._trump_suit)
+            for _card in cards:
+                card = Card(card_transform(_card.id, self._trump_suit))
                 card_location[8 * (card.id // 10) + card.id % 10][(index - self.own_position) % 4] = 1
         self.tijden[0] += time.time() - now
 
