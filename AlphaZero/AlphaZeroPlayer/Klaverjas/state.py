@@ -587,7 +587,7 @@ class State:
         # Set the locations of the cards in the hands
         for index, cards in enumerate(determinization):
             for _card in cards:
-                card = Card(card_transform(_card.id, self._trump_suit))
+                card = Card(card_transform(_card.id, ["k", "h", "r", "s"].index(self._trump_suit)))
                 card_location[8 * (card.id // 10) + card.id % 10][(index - self.own_position) % 4] = 1
         self.tijden[0] += time.time() - now
 
