@@ -353,7 +353,7 @@ class State:
             for i in range(4):
                 self.possible_cards[i] |= self.removed_cards[i]
 
-    # alternative representation with obtained cards split per team
+    # determinized alternative representation with obtained cards split per team
     def to_nparray(self):
         """
         Convert the game state to a numpy array own position will become index 0
@@ -364,7 +364,7 @@ class State:
         # players in one of the 4 centre positions or already played
         now = time.time()
         # Set the locations of the cards in the hands
-        for index, cards in enumerate(self.possible_cards):
+        for index, cards in enumerate(self.hands):
             for card in cards:
                 card_location[8 * (card.id // 10) + card.id % 10][(index - self.own_position) % 4] = 1
         self.tijden[0] += time.time() - now
@@ -499,7 +499,7 @@ class State:
         return np.concatenate((card_location.flatten(), array))
 
     #determinized
-    def to_nparray(self):
+    def to_nparray_nope(self):
         """
         Convert the game state to a numpy array own position will become index 0
         first 32x9 array: 32 cards, 9 possible locations by one of the 4 players in one of the 4 centre positions or already played

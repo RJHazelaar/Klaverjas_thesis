@@ -226,24 +226,25 @@ class MCTS:
             # Simulation
             if not current_state.round_complete():
                 sim_score = 0
-                for _ in range(self.n_of_sims):
+                if(self.nn_scaler == 0):
+                    for _ in range(self.n_of_sims):
 
-                    children = []
+                        children = []
 
-                    # Do random moves until round is complete
-                    while not current_state.round_complete():
+                        # Do random moves until round is complete
+                        while not current_state.round_complete():
 
-                        move = random.choice(list(current_state.legal_moves()))
-                        children.append(move)
-                        current_state.do_move(move, "simulation")
+                            move = random.choice(list(current_state.legal_moves()))
+                            children.append(move)
+                            current_state.do_move(move, "simulation")
 
-                    # Add score to points
-                    sim_score += current_state.get_score(self.player_position)
+                        # Add score to points
+                        sim_score += current_state.get_score(self.player_position)
 
-                    # Undo moves
-                    children.reverse()
-                    for move in children:
-                        current_state.undo_move(move, False)
+                        # Undo moves
+                        children.reverse()
+                        for move in children:
+                            current_state.undo_move(move, False)
 
                 # Average the score
                 if self.n_of_sims > 0:
