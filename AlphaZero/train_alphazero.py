@@ -49,16 +49,16 @@ def selfplay(mcts_params, model_path, num_rounds, extra_noise_ratio):
 
                 if current_player == 0:
                     played_card = alpha_player_0.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4] = alpha_player_0.state.to_nparray_hand(round.player_hands) #
+                    X_train[round_num * 36 + trick * 4] = alpha_player_0.state.to_nparray() #
                 elif current_player == 1:
                     played_card = alpha_player_1.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4 + 1] = alpha_player_1.state.to_nparray_hand(round.player_hands) #
+                    X_train[round_num * 36 + trick * 4 + 1] = alpha_player_1.state.to_nparray() #
                 elif current_player == 2:
                     played_card = alpha_player_2.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4 + 2] = alpha_player_2.state.to_nparray_hand(round.player_hands) # 
+                    X_train[round_num * 36 + trick * 4 + 2] = alpha_player_2.state.to_nparray() # 
                 else:
                     played_card = alpha_player_3.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4 + 3] = alpha_player_3.state.to_nparray_hand(round.player_hands) #
+                    X_train[round_num * 36 + trick * 4 + 3] = alpha_player_3.state.to_nparray() #
 
                 alpha_player_0.update_state_alt(played_card)
                 alpha_player_1.update_state_alt(played_card)
