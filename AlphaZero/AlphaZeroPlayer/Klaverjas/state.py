@@ -311,54 +311,6 @@ class State:
         else:
             self.current_player = (self.current_player + 1) % 4
 
-    def do_move_alt(self, card: Card, mode: str = "normal"):
-        """Play a card and update the game state"""
-        if mode == "normal":
-            self.update_possible_cards(card, False)
-            if self.current_player == self.own_position:
-                self.hands[self.current_player].remove(card)
-        elif mode == "mcts_move":
-            self.update_possible_cards(card, True)
-            self.hands[self.current_player].remove(card)
-        elif mode == "simulation":
-            self.hands[self.current_player].remove(card)
-        else:
-            raise Exception("Invalid mode")
-
-        self.tricks[-1].add_card(card)
-
-        self.cards_left[self.current_player] -= 1
-        if self.tricks[-1].trick_complete():
-            winner = self.tricks[-1].winner()
-            team_winner = team(winner)
-
-            self.pit_check += team_winner
-
-            points = self.tricks[-1].points()
-            meld = self.tricks[-1].meld()
-
-            self.points[team_winner] += points
-            self.meld[team_winner] += meld
-
-            if self.round_complete():
-
-                # Winner of last trick gets 10 points
-                self.points[team_winner] += 10
-                defending_team = 1 - self.declaring_team
-
-                # Check if the round has "pit"
-                if self.pit_check == self.declaring_team * 8:
-                    self.meld[self.declaring_team] += 100
-
-                self.final_score[0] = self.points[0] + self.meld[0]
-                self.final_score[1] = self.points[1] + self.meld[1]
-
-            else:
-                self.tricks.append(Trick(winner))
-                self.current_player = winner
-        else:
-            self.current_player = (self.current_player + 1) % 4
-
     def undo_move(self, card: Card, reverse_possible_cards: bool = False):
         """Undo the last move made in the game. Can only be used for moves within mcts"""
         if self.tricks[-1].cards == [] or self.round_complete():

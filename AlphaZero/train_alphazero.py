@@ -60,10 +60,10 @@ def selfplay(mcts_params, model_path, num_rounds, extra_noise_ratio):
                     played_card = alpha_player_3.get_move(True, extra_noise_ratio)
                     X_train[round_num * 36 + trick * 4 + 3] = alpha_player_3.state.to_nparray() #
 
-                alpha_player_0.update_state_alt(played_card)
-                alpha_player_1.update_state_alt(played_card)
-                alpha_player_2.update_state_alt(played_card)
-                alpha_player_3.update_state_alt(played_card)
+                alpha_player_0.update_state(played_card)
+                alpha_player_1.update_state(played_card)
+                alpha_player_2.update_state(played_card)
+                alpha_player_3.update_state(played_card)
 
         # generate state and score for end state
         X_train[round_num * 36 + 32] = alpha_player_0.state.to_nparray() #
