@@ -40,7 +40,7 @@ class MCTS_Node:
         self.children_moves.add(move)
         return new_node
 
-    def select_child_ucb(self, c: int, simulation) -> MCTS_Node:
+    def select_child_ucb(self, c: int, simulation, root_team) -> MCTS_Node:
         ucbs = []
         legal_children = [child for child in self.children if child.move in self.legal_moves]
 
@@ -48,7 +48,7 @@ class MCTS_Node:
         for child in legal_children:
             if child.visits == 0:
                 return child
-            if self.team:
+            if self.team == root_team:
                 ucbs.append(child.score / child.visits + c * np.sqrt(np.log(simulation) / child.visits))
             else:
                 ucbs.append(-child.score / child.visits + c * np.sqrt(np.log(simulation) / child.visits))
@@ -206,7 +206,7 @@ class MCTS:
             while (
                 not current_state.round_complete() and current_node.legal_moves - current_node.children_moves == set()
             ):
-                current_node = current_node.select_child_ucb(self.ucb_c, simulation)
+                current_node = current_node.select_child_ucb(self.ucb_c, simulation, root_team)
                 current_state.do_move(current_node.move, "mcts_move")
                 current_node.set_legal_moves(current_state)
             self.tijden[1] += time.time() - now
