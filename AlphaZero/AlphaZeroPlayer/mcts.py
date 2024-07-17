@@ -128,7 +128,7 @@ class MCTS:
                         current_state.do_move(move, "simulation")
 
                     # Add score to points
-                    sim_score += current_state.get_score(self.player_position)
+                    sim_score += current_state.get_score(self.player_position) # Score from perspective of root node player
 
                     # Undo moves
                     children.reverse()
@@ -152,7 +152,7 @@ class MCTS:
                 else:
                     nn_score = 0
             else:
-                sim_score = current_state.get_score(self.player_position)
+                sim_score = current_state.get_score(self.player_position) #Score from perspective of root node player
                 nn_score = sim_score
 
             self.tijden[3] += time.time() - now
@@ -236,7 +236,7 @@ class MCTS:
                             current_state.do_move(move, "simulation")
 
                         # Add score to points
-                        sim_score += current_state.get_score(self.player_position)
+                        sim_score += current_state.get_score(self.player_position) #Score from perspective of root node player
 
                         # Undo moves
                         children.reverse()
@@ -257,13 +257,12 @@ class MCTS:
                     self.tijden2[1] += time.time() - now2
                     now2 = time.time()
                     nn_score = int(self.model(arr))
-                    if (self.player_position % 2) != (root_team): #All scores in tree are from perspective of root player, nn output is from perspective of input player
-                        nn_score = -nn_score
+
                     self.tijden2[2] += time.time() - now2
                 else:
                     nn_score = 0
             else:
-                sim_score = current_state.get_score(self.player_position)
+                sim_score = current_state.get_score(self.player_position) #Score from perspective of root node player
                 nn_score = sim_score
 
             self.tijden[3] += time.time() - now
