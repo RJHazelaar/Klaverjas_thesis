@@ -162,7 +162,8 @@ def main():
             "mcts_steps": 50,
             "n_of_sims": 0,
             "nn_scaler": 1,
-            "ucb_c": 1.4,
+            "ucb_c": 1.25,
+            "steps_per_determinization": 25,
         },
     }
     fit_params = {
@@ -177,7 +178,7 @@ def main():
             "mcts_steps": 10,
             "n_of_sims": 0,
             "nn_scaler": 1,
-            "ucb_c": 1.4,
+            "ucb_c": 1.25,
         },
     }
     run_train(

@@ -27,7 +27,7 @@ def run_test():
     opponent = "pimc"
     multiprocessing = True #TODO
 
-    num_rounds = 5000
+    num_rounds = 1000
     num_rounds = (
         math.ceil(num_rounds / n_cores) * n_cores
     )  # make sure rounds is divisible by n_cores and not devide to 0
@@ -73,6 +73,8 @@ def run_test():
         "eval_time(ms):",
         alpha_eval_time,
     )
+
+    print(scores_round)
 
 
 if __name__ == "__main__":
