@@ -350,7 +350,8 @@ class MCTS:
                     arr = np.array([stat])
                     self.tijden2[1] += time.time() - now2
                     now2 = time.time()
-                    nn_score = int(self.model(arr)["value_head"])
+                    nn_score, prob_dist = self.model(arr)
+                    nn_score = int(nn_score)
                     self.tijden2[2] += time.time() - now2
                 else:
                     nn_score = 0
