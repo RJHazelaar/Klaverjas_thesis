@@ -19,6 +19,7 @@ def run_test():
 
     #TODO Klopt dit????
     n_cores = os.cpu_count()
+    n_cores = 20
     #TODO rule for heavy vs rule
     #TODO alphazero for heavy vs standard_alphazero
     # rule, rule_heavy, alphazero
@@ -26,7 +27,7 @@ def run_test():
     opponent = "pimc"
     multiprocessing = True #TODO
 
-    num_rounds = 10000
+    num_rounds = 5000
     num_rounds = (
         math.ceil(num_rounds / n_cores) * n_cores
     )  # make sure rounds is divisible by n_cores and not devide to 0
@@ -36,7 +37,7 @@ def run_test():
         "n_of_sims": 1,
         "nn_scaler": 0,
         "ucb_c": 200,
-        "steps_per_determinization": 50,
+        "steps_per_determinization": 10,
     }
 
     # model_paths = ["SL_models/SL_model_0.h5", None]

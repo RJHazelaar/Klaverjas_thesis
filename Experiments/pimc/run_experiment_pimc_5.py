@@ -37,7 +37,7 @@ def run_test():
         "n_of_sims": 1,
         "nn_scaler": 0,
         "ucb_c": 200,
-        "steps_per_determinization": 40,
+        "steps_per_determinization": 200,
     }
 
     # model_paths = ["SL_models/SL_model_0.h5", None]

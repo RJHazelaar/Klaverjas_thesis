@@ -11,7 +11,7 @@ from AlphaZero.AlphaZeroPlayer.Klaverjas.state import State
 
 
 class MCTS_Node:
-    def __init__(self, team, parent: MCTS_Node = None, move: Card = None):
+    def __init__(self, team, parent: MCTS_Node = None, move: Card = None, root: bool = False):
         self.children = set()
         self.children_moves = set()
         self.parent = parent
@@ -19,6 +19,9 @@ class MCTS_Node:
         self.score = 0
         self.visits = 0
         self.team = team
+        self.q_min = -162
+        self.q_max = 162
+        self.root = root
 
     def __repr__(self) -> str:
         return f"Node({self.move}, {self.parent.move}, {self.score}, {self.visits})"
@@ -34,25 +37,78 @@ class MCTS_Node:
     def set_legal_moves(self, state: State):
         self.legal_moves = state.legal_moves()
 
-    def expand(self):
-        move = random.choice(list(self.legal_moves - self.children_moves))
+    def expand(self, new_node):
+        move = new_node
         new_node = MCTS_Node(not self.team, self, move)
         self.children.add(new_node)
         self.children_moves.add(move)
         return new_node
+    
+    def update_max_score(self, score):
+        if score > self.q_max:
+            self.q_max = score
+        elif score < self.q_min:
+            self.q_min = score
+    
+    def normalized_score(self, score):
+        return (2 * (score - self.q_min)) / (self.q_max - self.q_min) - 1
 
-    def select_child_ucb(self, c: int, simulation, root_team) -> MCTS_Node:
+    def select_child_puct(self, c, simulation, root_team, state, model):
         ucbs = []
-        legal_children = [child for child in self.children if child.move in self.legal_moves]
-        for child in legal_children:
-            if child.visits == 0:
-                return child
-            if self.team == root_team:
-                ucbs.append(child.score / child.visits + c * np.sqrt(np.log(simulation) / child.visits))
+        return_nodes = []
+        legal_moves = list(self.legal_moves)
+        # Return the only legal move from the state
+        if len(legal_moves) == 1:
+            return legal_moves[0]
+        
+        # model returns a distribution over 32 features, the cards
+        stat = state.to_nparray()
+        value, prob_distr = model(np.array([stat])) #32 size array
+        prob_distr = prob_distr.numpy().ravel().tolist()
+
+        moves = [a.id for a in legal_moves]
+        all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
+
+        dic = dict(zip(all_cards, prob_distr))
+        # Remove probabilities of illegal moves
+        prob_distr_legal = [0 if x not in dic else dic[x] for x in moves]
+        zeroes = [0] * len(prob_distr_legal)
+        # Renormalize probabilities
+        if prob_distr_legal == zeroes:
+            probabilities_legal = zeroes
+        else:
+            probabilities_legal = prob_distr_legal / np.linalg.norm(prob_distr_legal)
+
+        # Add Dirichlet noise for added exploration from root during training
+        if self.root:
+            dirichlet_alpha = 0.3
+            dirichlet_epsilon = 0.25
+            dirichlet_noise = [dirichlet_alpha] * len(probabilities_legal)
+            for index, prob in enumerate(probabilities_legal):
+                probabilities_legal[index] = (1-dirichlet_epsilon)*prob + dirichlet_epsilon * dirichlet_noise[index]
+
+        child_prob = dict(zip(moves, probabilities_legal))
+
+        children_moves = []
+        children_nodes = []
+        for child in self.children:
+            children_moves.append(child.move.id)
+            children_nodes.append(child)
+        children_dict = dict(zip(children_moves, children_nodes))
+
+        for move in moves:
+            if move not in children_moves: #Node not added to tree
+                return_nodes.append(self)
+                ucbs.append(c * (child_prob[move]))
             else:
-                ucbs.append(-child.score / child.visits + c * np.sqrt(np.log(simulation) / child.visits))
+                child = children_dict[move]
+                return_nodes.append(child)
+                if self.team == root_team:
+                    ucbs.append(self.normalized_score(child.score / child.visits) + c * (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)))
+                else:
+                    ucbs.append(-self.normalized_score(child.score / child.visits) + c * (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)))
         index_max = np.argmax(np.array([ucbs]))
-        return legal_children[index_max]
+        return legal_moves[index_max], return_nodes[index_max] #new_node_move, new_node_node
 
 
 class MCTS:
@@ -73,30 +129,36 @@ class MCTS:
             self.steps_per_determinization = params["steps_per_determinization"]
         except:
             print("no steps per determinization")
+        try: 
+            self.dirichlet_noise = params["dirichlet_noise"]
+        except:
+            self.dirichlet_noise = 0
 
     def __call__(self, state: State, training: bool, extra_noise_ratio):
         if self.time_limit != None:
-            move = self.mcts_timer(state, training, extra_noise_ratio)
+            move, policy = self.mcts_timer(state, training, extra_noise_ratio)
         else:
-            move = self.pimc_call(state, training, extra_noise_ratio)
+            move, policy = self.pimc_call(state, training, extra_noise_ratio)
         return move
     
     def pimc_call(self, state, training, extra_noise_ratio):
         legal_moves = state.legal_moves()
         if len(legal_moves) == 1:
             return next(iter(legal_moves))
-
+        
         # for fixed order of moves
         legal_moves_list = list(legal_moves)
 
         combined_policy = np.zeros(len(legal_moves))
         for determinization in range(self.mcts_steps // self.steps_per_determinization):
             move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.steps_per_determinization)
+            # Moves might not always be in the same order
             policy = [policy_dict[x] for x in legal_moves_list]            
             combined_policy += np.array(policy)
         
         if self.mcts_steps % self.steps_per_determinization > 8:
-            move = self.mcts_n_simulations(state, training, extra_noise_ratio, self.mcts_steps % self.steps_per_determinization)
+            move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.mcts_steps % self.steps_per_determinization)
+            # Moves might not always be in the same order
             policy = [policy_dict[x] for x in legal_moves_list]            
             combined_policy += np.array(policy)
         
@@ -111,7 +173,12 @@ class MCTS:
         else:
             move = child
 
-        return move
+        # policy is over all 32 possible moves, need list of size 32 for (target) policy
+        all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
+        dic = dict(zip(legal_moves_list, probabilities))
+        policy = [0 if x not in dic else dic[x] for x in all_cards]
+
+        return move, policy
 
     def mcts_timer(self, state: State, training: bool, extra_noise_ratio):
         legal_moves = state.legal_moves()
@@ -223,9 +290,12 @@ class MCTS:
     
     def mcts_n_simulations(self, state: State, training: bool, extra_noise_ratio, steps):
         legal_moves = state.legal_moves()
+        if len(legal_moves) == 1:
+            return next(iter(legal_moves))
 
         current_state = copy.deepcopy(state)
-        root_team = current_state.current_player % 2
+        # Team of root player
+        root_team = current_state.current_player % 2 
         current_node = MCTS_Node(team = root_team)
 
         for simulation in range(steps):
@@ -236,20 +306,28 @@ class MCTS:
             self.tijden[0] += time.time() - now
             now = time.time()
             # Selection
+            new_node = None
             current_node.set_legal_moves(current_state)
+            leaf_selected = False
             while (
-                not current_state.round_complete() and current_node.legal_moves - current_node.children_moves == set()
+                not current_state.round_complete() and leaf_selected == False
             ):
-                current_node = current_node.select_child_ucb(self.ucb_c, simulation, root_team)
-                current_state.do_move(current_node.move, "mcts_move")
-                current_node.set_legal_moves(current_state)
+                new_node_move, new_node_node = current_node.select_child_puct(self.ucb_c, simulation, root_team, current_state, self.model)
+                if new_node_move not in current_node.children_moves:
+                    #Go to expand
+                    current_node = current_node
+                    leaf_selected = True
+                else:
+                    current_node = new_node_node
+                    current_state.do_move(current_node.move, "mcts_move")
+                    current_node.set_legal_moves(current_state)
             self.tijden[1] += time.time() - now
             now = time.time()
             # Expansion
             if not current_state.round_complete():
-                new_node = current_node.expand()
+                current_state.do_move(new_node_move, "mcts_move")
+                new_node = current_node.expand(new_node_move)
                 current_node = new_node
-                current_state.do_move(current_node.move, "mcts_move")
                 current_node.team = current_state.current_player % 2
 
             self.tijden[2] += time.time() - now
@@ -257,23 +335,6 @@ class MCTS:
             # Simulation
             if not current_state.round_complete():
                 sim_score = 0
-                for _ in range(self.n_of_sims):
-                    children = []
-
-                    # Do random moves until round is complete
-                    while not current_state.round_complete():
-
-                        move = random.choice(list(current_state.legal_moves()))
-                        children.append(move)
-                        current_state.do_move(move, "simulation")
-
-                    # Add score to points
-                    sim_score += current_state.get_score(self.player_position)
-
-                    # Undo moves
-                    children.reverse()
-                    for move in children:
-                        current_state.undo_move(move, False)
 
                 # Average the score
                 if self.n_of_sims > 0:
@@ -281,13 +342,13 @@ class MCTS:
 
                 if self.model is not None:
                     now2 = time.time()
-                    stat = current_state.to_nparray()
+                    stat = current_state.to_nparray_alt()
                     self.tijden2[0] += time.time() - now2
                     now2 = time.time()
                     arr = np.array([stat])
                     self.tijden2[1] += time.time() - now2
                     now2 = time.time()
-                    nn_score = int(self.model(arr))
+                    nn_score = int(self.model(arr)["value_head"])
                     self.tijden2[2] += time.time() - now2
                 else:
                     nn_score = 0
@@ -300,12 +361,12 @@ class MCTS:
             # Backpropagation
             while current_node.parent is not None:
                 current_node.visits += 1
-                current_node.score += (1 - self.nn_scaler) * sim_score + self.nn_scaler * nn_score
+                current_node.score += nn_score
                 current_state.undo_move(current_node.move, True)
                 current_node = current_node.parent
 
             current_node.visits += 1
-            current_node.score += (1 - self.nn_scaler) * sim_score + self.nn_scaler * nn_score
+            current_node.score += nn_score
             self.tijden[4] += time.time() - now
             now = time.time()
 
