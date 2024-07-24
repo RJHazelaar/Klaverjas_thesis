@@ -67,7 +67,7 @@ class MCTS_Node:
 
         moves = [a.id for a in legal_moves]
         all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
-        all_cards_legal = np.in1d(all_cards, moves).astype(int)
+
         dic = dict(zip(all_cards, prob_distr))
         prob_distr_legal = [0 if x not in dic else dic[x] for x in moves]
         nullen = [0] * len(prob_distr_legal)
@@ -76,6 +76,7 @@ class MCTS_Node:
         else:
             probabilities_legal = prob_distr_legal / np.linalg.norm(prob_distr_legal)
 
+        # Add Dirichlet noise for added exploration from root during training
         if self.root:
             probabilities_legal = probabilities_legal #TODO TODO TODO TODO TODO DIRICHLET
         child_prob = dict(zip(moves, probabilities_legal))

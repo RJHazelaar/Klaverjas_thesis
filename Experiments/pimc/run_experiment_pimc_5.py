@@ -6,7 +6,7 @@ import sys
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../..")))
 sys.path.append(parent_dir)
-from AlphaZero.experiment_alphazero import run_test_multiprocess
+from AlphaZero.experiment_pimc import run_test_multiprocess
 
 
 def run_test():
@@ -24,7 +24,8 @@ def run_test():
     #TODO alphazero for heavy vs standard_alphazero
     # rule, rule_heavy, alphazero
     # Alphazero for heavy vs random rollout test
-    opponent = "pimc"
+    n_cores = os.cpu_count()
+    n_cores = 20
     multiprocessing = True #TODO
 
     num_rounds = 5000
