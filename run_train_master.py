@@ -139,7 +139,7 @@ def main():
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
         "budget": 8,  # hours
-        "multiprocessing": True,
+        "multiprocessing": False,
         "n_cores": n_cores,
     }
     model_params = {
