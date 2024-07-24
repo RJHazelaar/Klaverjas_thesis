@@ -67,6 +67,8 @@ def run_test():
         "score:",
         round(mean_score, 1),
         "std_score:",
+        round(np.std(scores_round), 1),
+        "std_error",
         round(np.std(scores_round) / np.sqrt(len(scores_round)), 1),
         "eval_time(ms):",
         alpha_eval_time,
