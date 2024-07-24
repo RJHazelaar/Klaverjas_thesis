@@ -26,6 +26,7 @@ def run_test():
     # Alphazero for heavy vs random rollout test
     n_cores = os.cpu_count()
     n_cores = 20
+    opponent = "pimc"
     multiprocessing = True #TODO
 
     num_rounds = 5000
