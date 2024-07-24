@@ -64,7 +64,7 @@ class MCTS_Node:
             return legal_moves[0]
         
         # model returns a distribution over 32 features, the cards
-        stat = state.to_nparray()
+        stat = state.to_nparray_alt()
         value, prob_distr = model(np.array([stat])) #32 size array
         prob_distr = prob_distr.numpy().ravel().tolist()
 
