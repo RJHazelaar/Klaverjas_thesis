@@ -66,11 +66,12 @@ class MCTS_Node:
         # model returns a distribution over 32 features, the cards
         stat = state.to_nparray_alt()
 
-        #stat = np.array([stat])
+        stat = np.array([stat])
         print("stat")
         print(stat)
         print("shape")
         print(stat.shape)
+        stat =  stat.reshape(1, -1)
 
         value, prob_distr = model(stat) #32 size array
         prob_distr = prob_distr.numpy().ravel().tolist()
