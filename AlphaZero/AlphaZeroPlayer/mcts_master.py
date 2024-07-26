@@ -67,7 +67,6 @@ class MCTS_Node:
         stat = state.to_nparray_alt()
 
         stat = np.array([stat])
-        stat = np.squeeze(stat)
         print("stat")
         print(stat)
         print("shape")
