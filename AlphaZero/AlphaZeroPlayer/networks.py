@@ -13,9 +13,10 @@ def create_small_two_headed_nn(learning_rate):
 
     input = tf.keras.layers.Input(shape=(299,))
 
-    base_layers = tf.keras.models.Sequential([tf.keras.layers.Dense(256, activation="relu")], name="base_layers")(
-        input
-    )
+    base_layers = tf.keras.models.Sequential(
+        [tf.keras.layers.Dense(256, activation="relu")],
+        name="base_layers",
+    )(input)
 
     value_head = tf.keras.models.Sequential(
         [tf.keras.layers.Dense(256, activation="relu"), tf.keras.layers.Dense(1, activation="linear")],
