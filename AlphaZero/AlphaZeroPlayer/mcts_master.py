@@ -65,6 +65,7 @@ class MCTS_Node:
         
         # model returns a distribution over 32 features, the cards
         stat = state.to_nparray_alt()
+        stat = np.squeeze(stat)
         stat = np.array([stat])
         print("stat")
         print(stat)
