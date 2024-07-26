@@ -71,7 +71,7 @@ class MCTS_Node:
         print(stat)
         print("shape")
         print(stat.shape)
-        stat =  stat.reshape(1, -1)
+        stat =  stat.reshape(-1, 1)
 
         value, prob_distr = model(stat) #32 size array
         prob_distr = prob_distr.numpy().ravel().tolist()
