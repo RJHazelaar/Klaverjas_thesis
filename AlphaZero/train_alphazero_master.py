@@ -70,19 +70,19 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
 
                 if current_player == 0:
                     played_card, policy = alpha_player_0.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4] = alpha_player_0.state.to_nparray_alt()
+                    X_train[round_num * 36 + trick * 4] = alpha_player_0.state.to_nparray()
                     y_train_policy[round_num * 36 + trick * 4] = policy 
                 elif current_player == 1:
                     played_card, policy = alpha_player_1.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4 + 1] = alpha_player_1.state.to_nparray_alt()
+                    X_train[round_num * 36 + trick * 4 + 1] = alpha_player_1.state.to_nparray()
                     y_train_policy[round_num * 36 + trick * 4 + 1] = policy 
                 elif current_player == 2:
                     played_card, policy = alpha_player_2.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4 + 2] = alpha_player_2.state.to_nparray_alt()
+                    X_train[round_num * 36 + trick * 4 + 2] = alpha_player_2.state.to_nparray()
                     y_train_policy[round_num * 36 + trick * 4 + 2] = policy 
                 else:
                     played_card, policy = alpha_player_3.get_move(True, extra_noise_ratio)
-                    X_train[round_num * 36 + trick * 4 + 3] = alpha_player_3.state.to_nparray_alt()
+                    X_train[round_num * 36 + trick * 4 + 3] = alpha_player_3.state.to_nparray()
                     y_train_policy[round_num * 36 + trick * 4 + 3] = policy 
 
                 alpha_player_0.update_state(played_card)
@@ -91,10 +91,10 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
                 alpha_player_3.update_state(played_card)
 
         # generate state and score for end state
-        X_train[round_num * 36 + 32] = alpha_player_0.state.to_nparray_alt()
-        X_train[round_num * 36 + 32 + 1] = alpha_player_1.state.to_nparray_alt()
-        X_train[round_num * 36 + 32 + 2] = alpha_player_2.state.to_nparray_alt()
-        X_train[round_num * 36 + 32 + 3] = alpha_player_3.state.to_nparray_alt()
+        X_train[round_num * 36 + 32] = alpha_player_0.state.to_nparray()
+        X_train[round_num * 36 + 32 + 1] = alpha_player_1.state.to_nparray()
+        X_train[round_num * 36 + 32 + 2] = alpha_player_2.state.to_nparray()
+        X_train[round_num * 36 + 32 + 3] = alpha_player_3.state.to_nparray()
         y_train_policy[round_num * 36 + 32] = [0] * 32
         y_train_policy[round_num * 36 + 32 + 1] = [0] * 32
         y_train_policy[round_num * 36 + 32 + 2] = [0] * 32
@@ -135,11 +135,11 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
 def train_nn(train_data, model: tf.keras.Sequential, fit_params, callbacks):
     epochs = fit_params["epochs"]
     batch_size = fit_params["batch_size"]
-    train_y = train_data[:, 311::]
+    train_y = train_data[:, 299::]
 
     #_train_y = np.array(list(zip(arr1, arr2)))
     X_train, X_test, y_train, y_test = train_test_split(
-        train_data[:, :311], train_y, train_size=0.8, shuffle=True
+        train_data[:, :299], train_y, train_size=0.8, shuffle=True
     )
 
     y_train_value, y_train_policy = y_train[:, 0], y_train[:, 1] 
