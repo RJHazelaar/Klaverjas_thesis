@@ -7,7 +7,7 @@ import time
 import tensorflow as tf
 import wandb
 
-from keras.utils import to_categorical, plot_model
+from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from multiprocessing import get_context
 
@@ -35,7 +35,7 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
     else:
         bidding_model = None
 
-    plot_model(model, "mcts_master_model", show_shapes=True)
+    model.summary()
     print("model plotted")
     # 32 turns + 4 end states, 1 for each player
     X_train = np.zeros((num_rounds * 36, 331), dtype=np.float16)
