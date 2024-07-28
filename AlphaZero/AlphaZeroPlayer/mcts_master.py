@@ -250,7 +250,7 @@ class MCTS:
 
                 if self.model is not None:
                     now2 = time.time()
-                    stat = current_state.to_nparray()
+                    stat = current_state.to_nparray_alt()
                     self.tijden2[0] += time.time() - now2
                     now2 = time.time()
                     arr = np.array([stat])

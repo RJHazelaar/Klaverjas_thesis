@@ -7,7 +7,7 @@ import time
 import tensorflow as tf
 import wandb
 
-from keras.utils import to_categorical 
+from keras.utils import to_categorical, plot_model
 from sklearn.model_selection import train_test_split
 from multiprocessing import get_context
 
@@ -35,6 +35,8 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
     else:
         bidding_model = None
 
+    plot_model(model, "mcts_master_model", show_shapes=True)
+    print("model plotted")
     # 32 turns + 4 end states, 1 for each player
     X_train = np.zeros((num_rounds * 36, 331), dtype=np.float16)
     y_train_value = np.zeros((num_rounds * 36, 1), dtype=np.float16)
@@ -135,11 +137,11 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
 def train_nn(train_data, model: tf.keras.Sequential, fit_params, callbacks):
     epochs = fit_params["epochs"]
     batch_size = fit_params["batch_size"]
-    train_y = train_data[:, 299::]
+    train_y = train_data[:, 331::]
 
     #_train_y = np.array(list(zip(arr1, arr2)))
     X_train, X_test, y_train, y_test = train_test_split(
-        train_data[:, :299], train_y, train_size=0.8, shuffle=True
+        train_data[:, :331], train_y, train_size=0.8, shuffle=True
     )
 
     y_train_value, y_train_policy = y_train[:, 0], y_train[:, 1] 

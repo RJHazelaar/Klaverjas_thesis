@@ -36,7 +36,7 @@ def create_small_two_headed_nn(learning_rate):
 
 
 def create_normal_two_headed_nn(learning_rate, l1, l2):
-    input = tf.keras.layers.Input(shape=(299,))
+    input = tf.keras.layers.Input(shape=(331,))
 
     base_layers = tf.keras.models.Sequential(
         [
