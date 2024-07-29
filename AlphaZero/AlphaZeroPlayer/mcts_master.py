@@ -65,7 +65,8 @@ class MCTS_Node:
             children_nodes = []
             return_node = None
             for child in self.children:
-                if child.move.id == legal_moves[0]:
+                move_id = child.move.id
+                if move_id == legal_moves[0]:
                     return_node = child
             if return_node == None: #Node not added to tree
                 return legal_moves[0], self
