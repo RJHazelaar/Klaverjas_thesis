@@ -139,14 +139,14 @@ def main():
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
         "budget": 8,  # hours
-        "multiprocessing": False,
+        "multiprocessing": True,
         "n_cores": n_cores,
     }
     model_params = {
         "model_type": "two_headed",
         "learning_rate": 0.01,
-        "l1": 0.0,
-        "l2": 0.0,
+        "l1": 0.01,
+        "l2": 0.01,
     }
     bidding_model_params = {
         "model_type": "bidding",
@@ -159,7 +159,7 @@ def main():
         "max_memory_multiplier": 10,  # memory size = rounds_per_step * 36 * max_memory_multiplier
         "extra_noise_ratio": 0.1,  # when training extra_noise_ratio * mcts_steps is added to all visit counts
         "mcts_params": {
-            "mcts_steps": 50,
+            "mcts_steps": 100,
             "n_of_sims": 0,
             "nn_scaler": 1,
             "ucb_c": 1.25,
@@ -179,6 +179,7 @@ def main():
             "n_of_sims": 0,
             "nn_scaler": 1,
             "ucb_c": 1.25,
+            "steps_per_determinization": 10,
         },
     }
     run_train(
