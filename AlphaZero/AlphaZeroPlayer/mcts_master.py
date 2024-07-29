@@ -66,7 +66,14 @@ class MCTS_Node:
             return_node = None
             for child in self.children:
                 move_id = child.move.id
-                if move_id == legal_moves[0]:
+                legal_move_id = legal_moves[0]
+                print(move_id)
+                print(type(move_id))
+                print(legal_moves[0])
+                print(type(legal_moves[0]))
+
+
+                if move_id == legal_move_id:
                     return_node = child
             if return_node == None: #Node not added to tree
                 return legal_moves[0], self
@@ -75,10 +82,6 @@ class MCTS_Node:
         
         # model returns a distribution over 32 features, the cards
         stat = state.to_nparray_alt()
-        print("stat")
-        print(stat)
-        print("shape")
-        print(stat.shape)
 
         value, prob_distr = model(np.array([stat])) #32 size array
         prob_distr = prob_distr.numpy().ravel().tolist()
