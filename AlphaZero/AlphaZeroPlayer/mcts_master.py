@@ -63,14 +63,11 @@ class MCTS_Node:
         if len(legal_moves) == 1:
             children_moves = []
             children_nodes = []
-            return_node = None
+            return_node = self
             for child in self.children:
                 if child.move.id == legal_moves[0].id:
                     return_node = child
-            if return_node == None: #Node not added to tree
-                return legal_moves[0], self
-            else:
-                return legal_moves[0], return_node 
+            return legal_moves[0], return_node 
         
         # model returns a distribution over 32 features, the cards
         stat = state.to_nparray_alt()
