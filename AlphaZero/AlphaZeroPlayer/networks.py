@@ -69,7 +69,7 @@ def create_normal_two_headed_nn(learning_rate, l1, l2):
     # Create the two-headed model
     model = tf.keras.models.Model(inputs=input, outputs=[value_head, policy_head])
 
-    def azLoss(yTrue,yPred):
+    def custom_loss(yTrue,yPred):
         y1True = yTrue[value_head]
         y2True = yTrue[policy_head]
 
@@ -93,11 +93,10 @@ def create_normal_two_headed_nn(learning_rate, l1, l2):
 
         return 1
 
-    lossfunc = azLoss
 
     # Define how to train the model
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss={'value_head': lossfunc, 'policy_head': 'sparse_categorical_crossentropy'}
+        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss={'value_head': custom_loss, 'policy_head': 'sparse_categorical_crossentropy'}
     )
     return model
 
