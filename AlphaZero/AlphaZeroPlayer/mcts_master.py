@@ -59,9 +59,18 @@ class MCTS_Node:
         ucbs = []
         return_nodes = []
         legal_moves = list(self.legal_moves)
-        # Return the only legal move from the state
+        # Return the only legal move from the state #TODO what node to return
         if len(legal_moves) == 1:
-            return legal_moves[0]
+            children_moves = []
+            children_nodes = []
+            return_node = None
+            for child in self.children:
+                if child.move.id == legal_moves[0]:
+                    return_node = child
+            if return_node == None: #Node not added to tree
+                return legal_moves[0], self
+            else:
+                return legal_moves[0], return_node 
         
         # model returns a distribution over 32 features, the cards
         stat = state.to_nparray_alt()

@@ -35,8 +35,9 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
     else:
         bidding_model = None
 
-    model.summary()
-    print("model plotted")
+    #model.summary()
+    #print("model plotted")
+    
     # 32 turns + 4 end states, 1 for each player
     X_train = np.zeros((num_rounds * 36, 331), dtype=np.float16)
     y_train_value = np.zeros((num_rounds * 36, 1), dtype=np.float16)

@@ -69,9 +69,33 @@ def create_normal_two_headed_nn(learning_rate, l1, l2):
     # Create the two-headed model
     model = tf.keras.models.Model(inputs=input, outputs=[value_head, policy_head])
 
+    def azLoss(yTrue,yPred):
+        y1True = yTrue[value_head]
+        y2True = yTrue[policy_head]
+
+        y1Pred = yPred[value_head]
+        y2Pred = yPred[policy_head]
+
+        print(yTrue)        
+        print(yPred)
+        print("dud")
+        print(y1True)
+        print(y2True)
+        print(y1Pred)
+        print(y2Pred)
+
+
+        #calculate alpha somehow with keras backend functions
+        #TODO Hardcoded alpha value (not learning rate alpha?)
+        mse = ((y1True - y1Pred) ** 2) * 0.5
+
+        ce = - np.transpose(y2True) *  2
+
+        return 1
+
     # Define how to train the model
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss={'value_head': 'mean_absolute_error', 'policy_head': 'sparse_categorical_crossentropy'}
+        optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss={'value_head': azLoss, 'policy_head': 'sparse_categorical_crossentropy'}
     )
     return model
 
