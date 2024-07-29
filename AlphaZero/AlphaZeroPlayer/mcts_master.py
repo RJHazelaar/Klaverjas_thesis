@@ -65,15 +65,7 @@ class MCTS_Node:
             children_nodes = []
             return_node = None
             for child in self.children:
-                move_id = child.move.id
-                legal_move_id = legal_moves[0]
-                print(move_id)
-                print(type(move_id))
-                print(legal_moves[0])
-                print(type(legal_moves[0]))
-
-
-                if move_id == legal_move_id:
+                if child.move.id == legal_moves[0].id:
                     return_node = child
             if return_node == None: #Node not added to tree
                 return legal_moves[0], self
