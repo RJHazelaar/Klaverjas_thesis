@@ -391,6 +391,14 @@ class MCTS:
 
         child = children[np.argmax(visits)]
 
+        # Handling of not all legal moves being visited from root
+        legal_moves_list = list(legal_moves)
+        if len(moves) < len(legal_moves_list):
+            for legal_m in legal_moves_list:
+                if legal_m not in moves:
+                    moves.append(legal_m)
+                    visits.append(0)
+
         if training == True:
             visits = np.array(visits) + int(self.mcts_steps * extra_noise_ratio)
             probabilities = visits / np.sum(visits)
