@@ -157,6 +157,7 @@ class MCTS:
         
         # for fixed order of moves
         legal_moves_list = list(legal_moves)
+        legal_moves_list_id = [leg_m.id for leg_m in legal_moves_list]
 
         combined_policy = np.zeros(len(legal_moves))
         for determinization in range(self.mcts_steps // self.steps_per_determinization):
@@ -184,7 +185,7 @@ class MCTS:
 
         # policy is over all 32 possible moves, need list of size 32 for (target) policy
         all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
-        dic = dict(zip(legal_moves_list, probabilities))
+        dic = dict(zip(legal_moves_list_id, probabilities))
         policy = [0 if x not in dic else dic[x] for x in all_cards]
 
         return move, policy
