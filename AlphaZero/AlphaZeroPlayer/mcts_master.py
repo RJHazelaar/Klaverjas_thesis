@@ -389,7 +389,7 @@ class MCTS:
             children.append(child)
             moves.append(child.move)
 
-        child = children[np.argmax(visits)]
+        best_move = children[np.argmax(visits)].move
 
         # Handling of not all legal moves being visited from root
         legal_moves_list = list(legal_moves)
@@ -402,9 +402,8 @@ class MCTS:
         if training == True:
             visits = np.array(visits) + int(self.mcts_steps * extra_noise_ratio)
             probabilities = visits / np.sum(visits)
-            move = np.random.choice(children, p=probabilities).move
-        else:
-            move = child.move
+            best_move = np.random.choice(moves, p=probabilities)
+
 
         policy_dict = dict(zip(moves, visits))
-        return move, policy_dict
+        return best_move, policy_dict
