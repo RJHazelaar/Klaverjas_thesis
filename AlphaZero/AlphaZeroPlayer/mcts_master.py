@@ -153,7 +153,10 @@ class MCTS:
     def pimc_call(self, state, training, extra_noise_ratio):
         legal_moves = state.legal_moves()
         if len(legal_moves) == 1:
-            return next(iter(legal_moves))
+            move = next(iter(legal_moves))
+            policy = [0] * 32
+            policy = [1 if x == move.id else 0 for x in policy]
+            return move, policy
         
         # for fixed order of moves
         legal_moves_list = list(legal_moves)
