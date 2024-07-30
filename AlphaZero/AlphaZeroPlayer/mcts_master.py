@@ -157,18 +157,19 @@ class MCTS:
         
         # for fixed order of moves
         legal_moves_list = list(legal_moves)
+        legal_moves_list_id = [leg_m.id for leg_m in legal_moves_list]
 
         combined_policy = np.zeros(len(legal_moves))
         for determinization in range(self.mcts_steps // self.steps_per_determinization):
             move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.steps_per_determinization)
             # Moves might not always be in the same order
-            policy = [policy_dict[x] for x in legal_moves_list]            
+            policy = [policy_dict[x] for x in legal_moves_list_id]            
             combined_policy += np.array(policy)
         
         if self.mcts_steps % self.steps_per_determinization > 8:
             move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.mcts_steps % self.steps_per_determinization)
             # Moves might not always be in the same order
-            policy = [policy_dict[x] for x in legal_moves_list]            
+            policy = [policy_dict[x] for x in legal_moves_list_id]            
             combined_policy += np.array(policy)
         
         visits = combined_policy.tolist()
@@ -406,4 +407,4 @@ class MCTS:
 
 
         policy_dict = dict(zip(moves, visits))
-        return best_move, policy_dict
+        return best_move.id, policy_dict
