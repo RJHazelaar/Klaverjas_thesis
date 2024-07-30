@@ -301,7 +301,7 @@ class MCTS:
     def mcts_n_simulations(self, state: State, training: bool, extra_noise_ratio, steps):
         legal_moves = state.legal_moves()
         if len(legal_moves) == 1:
-            return next(iter(legal_moves))
+            return next(iter(legal_moves)).id
 
         current_state = copy.deepcopy(state)
         # Team of root player
