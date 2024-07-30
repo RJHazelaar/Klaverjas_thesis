@@ -148,7 +148,7 @@ class MCTS:
             move, policy = self.mcts_timer(state, training, extra_noise_ratio)
         else:
             move, policy = self.pimc_call(state, training, extra_noise_ratio)
-        return move
+        return move, policy
     
     def pimc_call(self, state, training, extra_noise_ratio):
         legal_moves = state.legal_moves()
