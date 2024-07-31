@@ -11,14 +11,14 @@ from AlphaZero.AlphaZeroPlayer.Klaverjas.state import State
 
 
 class MCTS_Node:
-    def __init__(self, own_team: bool = True, parent: MCTS_Node = None, move: Card = None):
+    def __init__(self, team: bool = True, parent: MCTS_Node = None, move: Card = None):
         self.children = set()
         self.children_moves = set()
         self.parent = parent
         self.move = move
         self.score = 0
         self.visits = 0
-        self.own_team = own_team
+        self.team = team
 
     def __repr__(self) -> str:
         return f"Node({self.move}, {self.parent.move}, {self.score}, {self.visits})"
@@ -41,13 +41,13 @@ class MCTS_Node:
         self.children_moves.add(move)
         return new_node
 
-    def select_child_ucb(self, c: int, simulation) -> MCTS_Node:
+    def select_child_ucb(self, c: int, simulation, root_team) -> MCTS_Node:
         ucbs = []
         legal_children = [child for child in self.children if child.move in self.legal_moves]
         for child in legal_children:
             if child.visits == 0:
                 return child
-            if self.own_team:
+            if self.team == root_team:
                 ucbs.append(child.score / child.visits + c * np.sqrt(np.log(simulation) / child.visits))
             else:
                 ucbs.append(-child.score / child.visits + c * np.sqrt(np.log(simulation) / child.visits))
@@ -206,7 +206,8 @@ class MCTS:
             return next(iter(legal_moves))
 
         current_state = copy.deepcopy(state)
-        current_node = MCTS_Node()
+        root_team = current_state.current_player % 2
+        current_node = MCTS_Node(team = root_team)
         for simulation in range(self.mcts_steps):
 
             now = time.time()
@@ -229,6 +230,7 @@ class MCTS:
                 new_node = current_node.expand()
                 current_node = new_node
                 current_state.do_move(current_node.move, "mcts_move")
+                current_node.team = current_state.current_player % 2
 
             self.tijden[2] += time.time() - now
             now = time.time()

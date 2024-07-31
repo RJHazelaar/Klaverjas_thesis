@@ -4,14 +4,14 @@ import copy
 import random
 import numpy as np
 import time
-import random
+from collections import Counter
 
 from AlphaZero.AlphaZeroPlayer.Klaverjas.card import Card
 from AlphaZero.AlphaZeroPlayer.Klaverjas.state import State
 
 
 class MCTS_Node:
-    def __init__(self, team: bool = True, parent: MCTS_Node = None, move: Card = None):
+    def __init__(self, team, parent: MCTS_Node = None, move: Card = None):
         self.children = set()
         self.children_moves = set()
         self.parent = parent
@@ -36,7 +36,7 @@ class MCTS_Node:
 
     def expand(self):
         move = random.choice(list(self.legal_moves - self.children_moves))
-        new_node = MCTS_Node(not self.own_team, self, move)
+        new_node = MCTS_Node(not self.team, self, move)
         self.children.add(new_node)
         self.children_moves.add(move)
         return new_node
@@ -56,7 +56,7 @@ class MCTS_Node:
 
 
 class MCTS:
-    def __init__(self, params: dict, model, player_position: int, **kwargs):
+    def __init__(self, params: dict, model, player_position: int,  **kwargs):
         self.mcts_steps = params["mcts_steps"]
         self.n_of_sims = params["n_of_sims"]
         self.ucb_c = params["ucb_c"]
@@ -69,20 +69,53 @@ class MCTS:
             self.time_limit = params["time_limit"]
         except:
             self.time_limit = None
-        try:
-            self.e_cheat = params["e_cheat"]
+        try: 
+            self.steps_per_determinization = params["steps_per_determinization"]
         except:
-            self.e_cheat = 0 # 0% chance of using the cheating determinization
-        
+            print("no steps per determinization")
 
-    def __call__(self, state: State, training: bool, extra_noise_ratio, player_hands):
+    def __call__(self, state: State, training: bool, extra_noise_ratio):
         if self.time_limit != None:
-            move = self.mcts_timer(state, training, extra_noise_ratio, player_hands)
+            move = self.mcts_timer(state, training, extra_noise_ratio)
         else:
-            move = self.mcts_n_simulations(state, training, extra_noise_ratio, player_hands)
+            move = self.pimc_call(state, training, extra_noise_ratio)
         return move
     
-    def mcts_timer(self, state: State, training: bool, extra_noise_ratio, player_hands):
+    def pimc_call(self, state, training, extra_noise_ratio):
+        legal_moves = state.legal_moves()
+        if len(legal_moves) == 1:
+            return next(iter(legal_moves))
+
+        # for fixed order of moves
+        legal_moves_list = list(legal_moves)
+        legal_moves_list_id = [leg_m.id for leg_m in legal_moves_list]
+
+        combined_policy = np.zeros(len(legal_moves))
+        for determinization in range(self.mcts_steps // self.steps_per_determinization):
+            move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.steps_per_determinization)
+            policy = [policy_dict[x] for x in legal_moves_list]            
+            combined_policy += np.array(policy)
+        
+        # More budget left than amount of legal_moves
+        if self.mcts_steps % self.steps_per_determinization > len(legal_moves):
+            move = self.mcts_n_simulations(state, training, extra_noise_ratio, self.mcts_steps % self.steps_per_determinization)
+            policy = [policy_dict[x] for x in legal_moves_list]            
+            combined_policy += np.array(policy)
+        
+        visits = combined_policy.tolist()
+
+        child = legal_moves_list[np.argmax(visits)]
+
+        probabilities = visits / np.sum(visits)
+        if training == True:
+            visits = np.array(visits) + int(self.mcts_steps * extra_noise_ratio)
+            move = np.random.choice(legal_moves_list, p=probabilities)
+        else:
+            move = child
+
+        return move
+
+    def mcts_timer(self, state: State, training: bool, extra_noise_ratio):
         legal_moves = state.legal_moves()
         if len(legal_moves) == 1:
             return next(iter(legal_moves))
@@ -97,10 +130,7 @@ class MCTS:
             simulation += 1
             now = time.time()
             # Determination
-            if random.random() < self.e_cheat:
-                current_state.set_determinization_cheat(player_hands)
-            else:    
-                current_state.set_determinization()
+            current_state.set_determinization()
             self.tijden[0] += time.time() - now
             now = time.time()
             # Selection
@@ -193,23 +223,18 @@ class MCTS:
 
         return move
     
-    def mcts_n_simulations(self, state: State, training: bool, extra_noise_ratio, player_hands):
+    def mcts_n_simulations(self, state: State, training: bool, extra_noise_ratio, steps):
         legal_moves = state.legal_moves()
-        if len(legal_moves) == 1:
-            return next(iter(legal_moves))
-
+        
         current_state = copy.deepcopy(state)
         root_team = current_state.current_player % 2
-        current_node = MCTS_Node()
+        current_node = MCTS_Node(team = root_team)
 
-        for simulation in range(self.mcts_steps):
+        for simulation in range(steps):
 
             now = time.time()
             # Determination
-            if random.random() < self.e_cheat:
-                current_state.set_determinization_cheat(player_hands)
-            else:
-                current_state.set_determinization()
+            current_state.set_determinization()
             self.tijden[0] += time.time() - now
             now = time.time()
             # Selection
@@ -234,15 +259,17 @@ class MCTS:
             # Simulation
             if not current_state.round_complete():
                 sim_score = 0
+                #############################################################################################################################################
                 for _ in range(self.n_of_sims):
                     children = []
 
-                    # Do random moves until round is complete
                     while not current_state.round_complete():
-
-                        move = random.choice(list(current_state.legal_moves()))
+                        #TODO bekijk legal_moves method om wat mooiere implementatie te maken          
+                        newmove = self.get_card_good_player(current_state)
+                        # Convert from <class 'Lennard.deck.Card' to <class 'AlphaZero.AlphaZeroPlayer.Klaverjas.card.Card'>
+                        move = Card(newmove.id)
                         children.append(move)
-                        current_state.do_move(move, "simulation")
+                        current_state.do_move(move, "simulation")                       
 
                     # Add score to points
                     sim_score += current_state.get_score(self.player_position)
@@ -251,6 +278,8 @@ class MCTS:
                     children.reverse()
                     for move in children:
                         current_state.undo_move(move, False)
+
+                #############################################################################################################################################
 
                 # Average the score
                 if self.n_of_sims > 0:
@@ -288,9 +317,12 @@ class MCTS:
 
         visits = []
         children = []
+        moves = []
+
         for child in current_node.children:
             visits.append(child.visits)
             children.append(child)
+            moves.append(child.move)
 
         child = children[np.argmax(visits)]
 
@@ -301,4 +333,5 @@ class MCTS:
         else:
             move = child.move
 
-        return move
+        policy_dict = dict(zip(moves, visits))
+        return move, policy_dict
