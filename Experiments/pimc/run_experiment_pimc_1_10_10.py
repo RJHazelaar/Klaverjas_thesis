@@ -74,7 +74,7 @@ def run_test():
 
     scores_round_alt = []
     for l1, l2 in zip(odd_i, even_i):
-         scores_round_alt.append()
+         scores_round_alt.append(2)
          
     print(
         "score:",

@@ -62,19 +62,6 @@ def run_test():
     print("results exp6", mcts_params)
     print("time:", time.time() - now)
     mean_score = sum(scores_round) / len(scores_round)
-
-    odd_i = []
-    even_i = []
-
-    for i in range(0, len(scores_round)):
-        if i % 2:
-            even_i.append(scores_round[i])
-        else :
-            odd_i.append(scores_round[i])
-
-    scores_round_alt = []
-    for l1, l2 in zip(odd_i, even_i):
-         scores_round_alt.append()
          
     print(
         "score:",
