@@ -11,7 +11,7 @@ from AlphaZero.AlphaZeroPlayer.Klaverjas.state import State
 
 
 class MCTS_Node:
-    def __init__(self, team: bool = True, parent: MCTS_Node = None, move: Card = None):
+    def __init__(self, team, parent: MCTS_Node = None, move: Card = None):
         self.children = set()
         self.children_moves = set()
         self.parent = parent

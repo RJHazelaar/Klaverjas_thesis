@@ -11,7 +11,7 @@ from AlphaZero.AlphaZeroPlayer.Klaverjas.state import State
 
 
 class MCTS_Node:
-    def __init__(self, team: bool = True, parent: MCTS_Node = None, move: Card = None):
+    def __init__(self, team, parent: MCTS_Node = None, move: Card = None):
         self.children = set()
         self.children_moves = set()
         self.parent = parent
@@ -200,7 +200,7 @@ class MCTS:
 
         current_state = copy.deepcopy(state)
         root_team = current_state.current_player % 2
-        current_node = MCTS_Node()
+        current_node = MCTS_Node(root_team)
 
         for simulation in range(self.mcts_steps):
 

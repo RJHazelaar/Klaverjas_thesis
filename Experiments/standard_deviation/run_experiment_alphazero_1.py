@@ -71,6 +71,31 @@ def run_test():
     )
 
 
+
+    odd_i = []
+    even_i = []
+    for i in range(0, len(scores_round)):
+        if i % 2:
+            even_i.append(scores_round[i])
+        else :
+            odd_i.append(scores_round[i])
+ 
+    score_diff_diff = [sum(x) for x in zip(odd_i, even_i)]
+
+    mean_score_alt = sum(scores_round) / len(scores_round)
+
+    print(
+        "alt score:",
+        round(mean_score_alt, 1),
+        "alt std_score:",
+        round(np.std(score_diff_diff) / np.sqrt(len(score_diff_diff)), 1),
+        "eval_time(ms):",
+        alpha_eval_time,
+        "standard deviation:",
+        np.std(score_diff_diff),
+    )
+
+
 if __name__ == "__main__":
     start_time = time.time()
     run_test()
