@@ -36,7 +36,7 @@ class MCTS_Node:
 
     def expand(self):
         move = random.choice(list(self.legal_moves - self.children_moves))
-        new_node = MCTS_Node(not self.own_team, self, move)
+        new_node = MCTS_Node(not self.team, self, move)
         self.children.add(new_node)
         self.children_moves.add(move)
         return new_node

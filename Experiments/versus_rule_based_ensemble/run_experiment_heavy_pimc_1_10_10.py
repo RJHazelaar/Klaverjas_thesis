@@ -37,7 +37,7 @@ def run_test():
         "n_of_sims": 1,
         "nn_scaler": 0,
         "ucb_c": 200,
-        "steps_per_determinization": 40,
+        "steps_per_determinization": 10,
     }
 
     # model_paths = ["SL_models/SL_model_0.h5", None]
@@ -92,3 +92,4 @@ if __name__ == "__main__":
     start_time = time.time()
     run_test()
     print("Total time: ", time.time() - start_time)
+    print("Experiments/versus_rule_based_ensemble/run_experiment_heavy_pimc_1.py")

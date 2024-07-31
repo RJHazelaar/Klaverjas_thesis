@@ -77,3 +77,4 @@ if __name__ == "__main__":
     start_time = time.time()
     run_test()
     print("Total time: ", time.time() - start_time)
+    print("Experiments/versus_rule_based_ensemble/run_experiment_alphazero_cheat_1.py")
