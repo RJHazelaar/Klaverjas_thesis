@@ -380,7 +380,7 @@ class State:
         # Set the locations of the cards already played
         for trick in self.tricks[:-1]:
             for card in trick.cards:
-                if trick.winner:
+                if trick.winner % 1: #TODO
                     card_location[8 * (card.id // 10) + card.id % 10][8] = 1
                 else:
                     card_location[8 * (card.id // 10) + card.id % 10][9] = 1
@@ -722,7 +722,7 @@ class State:
 
         return np.concatenate((card_location.flatten(), array))
 
-    #determinized with hands and alt array input
+    #determinized with hands and alt array input from CURRENT PLAYER
     def to_nparray_hand_2(self, determinization):
         """
         Convert the game state to a numpy array own position will become index 0
@@ -742,7 +742,7 @@ class State:
         for index, cards in enumerate(determinization):
             for _card in cards:
                 card = Card(card_transform(_card.id, ["k", "h", "r", "s"].index(self._trump_suit)))
-                card_location[8 * (card.id // 10) + card.id % 10][(index - self.own_position) % 4] = 1
+                card_location[8 * (card.id // 10) + card.id % 10][(index - self.current_player) % 4] = 1
         self.tijden[0] += time.time() - now
 
         now = time.time()
@@ -750,7 +750,7 @@ class State:
         for index, card in enumerate(self.tricks[-1].cards):
             # print("tricks", self.tricks[-1].cards)
             card_location[8 * (card.id // 10) + card.id % 10][
-                4 + (self.tricks[-1].starting_player + index - self.own_position) % 4
+                4 + (self.tricks[-1].starting_player + index - self.current_player) % 4
             ] = 1
 
         # Set the locations of the cards already played

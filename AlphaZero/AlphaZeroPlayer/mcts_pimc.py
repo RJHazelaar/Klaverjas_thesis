@@ -88,6 +88,7 @@ class MCTS:
 
         # for fixed order of moves
         legal_moves_list = list(legal_moves)
+        legal_moves_list_id = [leg_m.id for leg_m in legal_moves_list]
 
         combined_policy = np.zeros(len(legal_moves))
         for determinization in range(self.mcts_steps // self.steps_per_determinization):
@@ -95,7 +96,8 @@ class MCTS:
             policy = [policy_dict[x] for x in legal_moves_list]            
             combined_policy += np.array(policy)
         
-        if self.mcts_steps % self.steps_per_determinization > 8:
+        # More budget left than amount of legal_moves
+        if self.mcts_steps % self.steps_per_determinization > len(legal_moves):
             move = self.mcts_n_simulations(state, training, extra_noise_ratio, self.mcts_steps % self.steps_per_determinization)
             policy = [policy_dict[x] for x in legal_moves_list]            
             combined_policy += np.array(policy)
@@ -223,7 +225,7 @@ class MCTS:
     
     def mcts_n_simulations(self, state: State, training: bool, extra_noise_ratio, steps):
         legal_moves = state.legal_moves()
-
+        
         current_state = copy.deepcopy(state)
         root_team = current_state.current_player % 2
         current_node = MCTS_Node(team = root_team)

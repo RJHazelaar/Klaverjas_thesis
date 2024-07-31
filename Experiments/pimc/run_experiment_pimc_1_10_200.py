@@ -27,7 +27,7 @@ def run_test():
     opponent = "pimc"
     multiprocessing = True #TODO
 
-    num_rounds = 1000
+    num_rounds = 5000
     num_rounds = (
         math.ceil(num_rounds / n_cores) * n_cores
     )  # make sure rounds is divisible by n_cores and not devide to 0
@@ -63,6 +63,19 @@ def run_test():
     print("time:", time.time() - now)
     mean_score = sum(scores_round) / len(scores_round)
 
+    odd_i = []
+    even_i = []
+
+    for i in range(0, len(scores_round)):
+        if i % 2:
+            even_i.append(scores_round[i])
+        else :
+            odd_i.append(scores_round[i])
+
+    scores_round_alt = []
+    for l1, l2 in zip(odd_i, even_i):
+         scores_round_alt.append()
+         
     print(
         "score:",
         round(mean_score, 1),

@@ -169,7 +169,7 @@ class MCTS:
             policy = [policy_dict[x] for x in legal_moves_list]            
             combined_policy += np.array(policy)
         
-        if self.mcts_steps % self.steps_per_determinization > len(legal_moves):
+        if self.mcts_steps % self.steps_per_determinization > 8:
             move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.mcts_steps % self.steps_per_determinization)
             # Moves might not always be in the same order
             policy = [policy_dict[x] for x in legal_moves_list]            
@@ -303,7 +303,7 @@ class MCTS:
     
     def mcts_n_simulations(self, state: State, training: bool, extra_noise_ratio, steps):
         legal_moves = state.legal_moves()
-        if len(legal_moves) == 1: #TODO Does not return policy, but having only 1 legal move is resolved earlier in pimc_call
+        if len(legal_moves) == 1:
             return next(iter(legal_moves)).id
 
         current_state = copy.deepcopy(state)
