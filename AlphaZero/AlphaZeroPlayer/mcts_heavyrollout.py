@@ -220,7 +220,7 @@ class MCTS:
             while (
                 not current_state.round_complete() and current_node.legal_moves - current_node.children_moves == set()
             ):
-                current_node = current_node.select_child_ucb(self.ucb_c, simulation)
+                current_node = current_node.select_child_ucb(self.ucb_c, simulation, root_team)
                 current_state.do_move(current_node.move, "mcts_move")
                 current_node.set_legal_moves(current_state)
             self.tijden[1] += time.time() - now

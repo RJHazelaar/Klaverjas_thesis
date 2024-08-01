@@ -335,3 +335,104 @@ class MCTS:
 
         policy_dict = dict(zip(moves, visits))
         return move, policy_dict
+
+#Returns the card to play according to the rule based agent
+    def get_card_good_player(self, cur_state):
+        player = cur_state.current_player
+        trick = cur_state.tricks[-1]
+        round = cur_state.round
+        trump = round.trump_suit
+        legal_moves = list(cur_state.legal_moves())
+
+        #When only 1 move is possible, select this move
+        if len(legal_moves) == 1:
+            return legal_moves[0]
+    
+        # Get highest value of highest value card still in the game for each suit
+        all_cards = list(cur_state.possible_cards[0] | cur_state.possible_cards[1] | cur_state.possible_cards[2] | cur_state.possible_cards[3])
+
+        # TODO Change this hardcoded method into more elegant function
+
+        # Split cards intro respective suits
+        trump_cards = [x for x in all_cards if x.id < 8]
+        suit1_cards = [x for x in all_cards if x.id > 9 and x.id < 18]
+        suit2_cards = [x for x in all_cards if x.id > 19 and x.id < 28]
+        suit3_cards = [x for x in all_cards if x.id > 29 and x.id < 38]
+        
+        trump_cards = sorted(trump_cards, key=lambda card: card.order())
+        suit1_cards = sorted(suit1_cards, key=lambda card: card.order())
+        suit2_cards = sorted(suit2_cards, key=lambda card: card.order())
+        suit3_cards = sorted(suit3_cards, key=lambda card: card.order())
+
+        ordered_cards = [trump_cards, suit1_cards, suit2_cards, suit3_cards]
+        dummy_card = Card(-1) # Card without value for exception handling
+        for cards in ordered_cards:
+            if len(cards) == 0:
+                cards.append(dummy_card) # list without cards for handling index out of range
+        
+        cant_follow = 0
+        if len(trick.cards) == 0:
+            for card in legal_moves:
+                if card.id == ordered_cards[card.suit][-1].id: # Use id instead of value, legal_moves might include same value cards from different suit
+                    return card
+            return self.get_lowest_card(legal_moves)
+
+        if legal_moves[0].suit == trick.cards[0].suit:
+            cant_follow = 1
+            
+        if len(trick.cards) == 1:
+            for card in legal_moves:
+                if card.id == ordered_cards[trick.leading_suit()][-1].id:   #TODO CHECK VOOR LIST INDEX OUT OF RANGE
+                    if card.order() > trick.cards[0].order(): # Is card better than leading card
+                        return card
+            return self.get_lowest_card(legal_moves)
+
+        if len(trick.cards) == 2:
+            if cant_follow:
+                return self.get_lowest_card(legal_moves)
+
+            # In turn 3 the player in 1st position is always teammate
+            if trick.cards[0].id == ordered_cards[trick.leading_suit()][-1].id:
+                return self.get_highest_card(legal_moves)
+
+            # ???? TODO Waar komt deze regel vandaan ????
+            for card in legal_moves:
+                if card.id == ordered_cards[trick.leading_suit()][-1].id:
+                    return card
+            # ???? TODO ????
+
+            return self.get_lowest_card(legal_moves)
+
+        else:
+            
+            if trick.winner() %2 == trick.to_play() %2:
+                return self.get_highest_card(legal_moves)
+
+            highest_card = trick.cards[0]
+            for card in trick.cards:
+                if card.order() > highest_card.order():
+                    highest_card = card
+                    
+            for card in legal_moves:
+                if card.order() > highest_card.order():
+                    return card
+
+            return self.get_lowest_card(legal_moves)
+    
+    def get_lowest_card(self, cards):
+        lowest_points = 21
+        for card in cards:
+            if card.points() < lowest_points:
+                lowest_card = card
+                lowest_points = card.points()
+        return lowest_card
+
+    def get_highest_card(self, cards):
+        highest_points = -1
+        for card in cards:
+            if card.points() > highest_points:
+                highest_card = card
+                highest_points = card.points()
+        return highest_card
+    
+    # TODO Clean up code by instead making highest_card function work with card ranks and suits

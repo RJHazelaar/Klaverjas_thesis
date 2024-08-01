@@ -3,6 +3,8 @@ import time
 import os
 import math
 import sys
+from scipy import stats
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../..")))
 sys.path.append(parent_dir)
@@ -18,7 +20,7 @@ def run_test():
         cluster = "local"
 
     #TODO Klopt dit????
-    n_cores = 20
+    n_cores = 4
     #TODO rule for heavy vs rule
     #TODO alphazero for heavy vs standard_alphazero
     # rule, rule_heavy, alphazero
@@ -68,6 +70,8 @@ def run_test():
         round(np.std(scores_round) / np.sqrt(len(scores_round)), 1),
         "eval_time(ms):",
         alpha_eval_time,
+        "Median Abs Deviation:",
+        stats.median_abs_deviation(scores_round),
     )
 
 
@@ -82,7 +86,7 @@ def run_test():
  
     score_diff_diff = [sum(x) for x in zip(odd_i, even_i)]
 
-    mean_score_alt = sum(scores_round) / len(scores_round)
+    mean_score_alt = sum(score_diff_diff) / len(score_diff_diff)
 
     print(
         "alt score:",
@@ -93,6 +97,8 @@ def run_test():
         alpha_eval_time,
         "standard deviation:",
         np.std(score_diff_diff),
+        "Median Abs Deviation:",
+        stats.median_abs_deviation(score_diff_diff),
     )
 
 
@@ -100,3 +106,4 @@ if __name__ == "__main__":
     start_time = time.time()
     run_test()
     print("Total time: ", time.time() - start_time)
+    print("run_experiment_alphazero_1 STDEV")

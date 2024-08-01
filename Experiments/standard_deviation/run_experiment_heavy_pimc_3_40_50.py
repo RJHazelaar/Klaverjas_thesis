@@ -3,6 +3,8 @@ import time
 import os
 import math
 import sys
+from scipy import stats
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../..")))
 sys.path.append(parent_dir)
@@ -19,7 +21,7 @@ def run_test():
 
     #TODO Klopt dit????
     n_cores = os.cpu_count()
-    n_cores = 20
+    n_cores = 4
     #TODO rule for heavy vs rule
     #TODO alphazero for heavy vs standard_alphazero
     # rule, rule_heavy, alphazero
@@ -67,15 +69,40 @@ def run_test():
         "score:",
         round(mean_score, 1),
         "std_score:",
-        round(np.std(scores_round), 1),
-        "std_error",
         round(np.std(scores_round) / np.sqrt(len(scores_round)), 1),
         "eval_time(ms):",
         alpha_eval_time,
+        "Median Abs Deviation:",
+        stats.median_abs_deviation(scores_round),
     )
 
+    odd_i = []
+    even_i = []
+    for i in range(0, len(scores_round)):
+        if i % 2:
+            even_i.append(scores_round[i])
+        else :
+            odd_i.append(scores_round[i])
+ 
+    score_diff_diff = [sum(x) for x in zip(odd_i, even_i)]
+
+    mean_score_alt = sum(score_diff_diff) / len(score_diff_diff)
+
+    print(
+        "alt score:",
+        round(mean_score_alt, 1),
+        "alt std_score:",
+        round(np.std(score_diff_diff) / np.sqrt(len(score_diff_diff)), 1),
+        "eval_time(ms):",
+        alpha_eval_time,
+        "standard deviation:",
+        np.std(score_diff_diff),
+        "Median Abs Deviation:",
+        stats.median_abs_deviation(score_diff_diff),
+    )
 
 if __name__ == "__main__":
     start_time = time.time()
     run_test()
     print("Total time: ", time.time() - start_time)
+    print("run_experiment_heavy_pimc_2 STDEV")
