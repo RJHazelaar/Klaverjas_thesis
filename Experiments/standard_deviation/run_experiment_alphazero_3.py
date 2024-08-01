@@ -71,8 +71,12 @@ def run_test():
         round(np.std(scores_round) / np.sqrt(len(scores_round)), 1),
         "eval_time(ms):",
         alpha_eval_time,
+        "standard deviation:",
+        round(np.std(scores_round), 1),
         "Median Abs Deviation:",
         stats.median_abs_deviation(scores_round),
+        "Absolute Mean Deviation:",
+        np.mean(np.absolute(scores_round - np.mean(scores_round)))   
     )
     
     odd_i = []
@@ -98,6 +102,8 @@ def run_test():
         np.std(score_diff_diff),
         "Median Abs Deviation:",
         stats.median_abs_deviation(score_diff_diff),
+        "Absolute Mean Deviation:",
+        np.mean(np.absolute(score_diff_diff - np.mean(score_diff_diff)))
     )
 
 
