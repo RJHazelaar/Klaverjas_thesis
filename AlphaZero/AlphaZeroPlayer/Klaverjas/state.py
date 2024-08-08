@@ -3,6 +3,7 @@ from __future__ import annotations  # To use the class name in the type hinting
 import random
 import time
 import numpy as np
+import copy
 
 from Lennard.rounds import Round
 from AlphaZero.AlphaZeroPlayer.Klaverjas.trick import Trick
@@ -19,6 +20,11 @@ class State:
         self.points = [0, 0]
         self.meld = [0, 0]
         self.tijden = [0, 0, 0, 0, 0]
+        # What player can follow what suit according to public information
+        # [player][suit]
+        self.can_follow_suit = [[1] * 4 for i in range(4)]
+        # highest by rank: [8, 9, 14, 12, 15, 10, 11, 13][self.value]
+        self.highest_trumps = [15,15,15,15] # Trump Jacks
 
     def init_from_Round(self, round: Round):
         self.round = round
@@ -43,6 +49,11 @@ class State:
 
         self.tricks = [Trick(self.current_player)]
 
+        # What player can follow what suit according to public information
+        self.can_follow_suit = [[1] * 4 for i in range(4)]
+        # highest by rank: [8, 9, 14, 12, 15, 10, 11, 13][self.value]
+        self.highest_trumps = [15,15,15,15] # Trump Jacks
+
     def init_from_klaverlive(self, own_hand, starting_player, declaring_team):
         self.current_player = starting_player
         self.declaring_team = declaring_team
@@ -60,6 +71,11 @@ class State:
         self.removed_cards = [set() for _ in range(4)]
 
         self.tricks = [Trick(self.current_player)]
+
+        # What player can follow what suit according to public information
+        self.can_follow_suit = [[1] * 4 for i in range(4)]
+        # highest by rank: [8, 9, 14, 12, 15, 10, 11, 13][self.value]
+        self.highest_trumps = [15,15,15,15] # Trump Jacks
 
     def set_determinization(self):
         other_players = [0, 1, 2, 3]
@@ -186,15 +202,29 @@ class State:
                 self.removed_cards[player] |= {played_card}
             self.possible_cards[player].discard(played_card)
 
+        leading_suit = self.tricks[-1].leading_suit()
         if self.current_player == self.own_position:
+            # Record what information other players can infer
+            if played_card.suit == 0:
+                if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
+                    # update public information
+                    self.highest_trumps[self.current_player] = played_card.order()
+            if played_card.suit != leading_suit:
+                # update public information
+                self.can_follow_suit[self.current_player][leading_suit] = 0
+                # remove all cards of the leading suit from the current player
+                if played_card.suit != 0:
+                    # update public information
+                    self.can_follow_suit[self.current_player][0] = 0
             return
 
-        leading_suit = self.tricks[-1].leading_suit()
         if leading_suit is None:
             return
 
         if played_card.suit == 0:
             if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
+                # update public information
+                self.highest_trumps[self.current_player] = played_card.order()
                 # remove all trump cards higher then the highest trump card from the current player
                 cards_to_remove = {
                     card
@@ -208,6 +238,8 @@ class State:
                 self.possible_cards[self.current_player] -= cards_to_remove
 
         if played_card.suit != leading_suit:
+            # update public information
+            self.can_follow_suit[self.current_player][leading_suit] = 0
             # remove all cards of the leading suit from the current player
             cards_to_remove = {Card(leading_suit * 10 + i) for i in range(8)}
             if reversable:
@@ -215,6 +247,8 @@ class State:
             self.possible_cards[self.current_player] -= cards_to_remove
 
             if played_card.suit != 0:
+                # update public information
+                self.can_follow_suit[self.current_player][0] = 0
                 # remove all trumps from the current player
                 cards_to_remove = {
                     card for card in self.possible_cards[self.current_player] if card.id in {0, 1, 2, 3, 4, 5, 6, 7}
@@ -224,6 +258,11 @@ class State:
                         raise Exception("Klopt nie heh")
                     self.removed_cards[self.current_player] |= cards_to_remove
                 self.possible_cards[self.current_player] -= cards_to_remove
+
+    def reset_information_set(self, info_suits, highest_trumps):
+        self.can_follow_suit = copy.deepcopy(info_suits)
+        self.highest_trumps = copy.deepcopy(highest_trumps)
+        return
 
     def legal_moves(self) -> set[Card]:
         hand = self.hands[self.current_player]
@@ -803,7 +842,136 @@ class State:
         self.tijden[3] += time.time() - now
 
         return np.concatenate((card_location.flatten(), array))
-    
+
+    # alt state representation, bart style input to nn, for other players != own_position
+    def to_nparray_alt_op(self):
+        """
+        Convert the game state to a numpy array own position will become index 0
+        first 32x9 array: 32 cards, 9 possible locations by one of the 4 players in one of the 4 centre positions or already played
+        second 11 array: starting player 4, current player 4, declaring 1, points 2
+        """
+        card_location = np.zeros((32, 10), dtype=np.float16)  # 32 cards, 9 possible locations by one of the 4
+        # players in one of the 4 centre positions or already played
+        now = time.time()
+        # Set the locations of the cards in the hands
+        own_hand = self.hands[self.current_player]
+        own_hand_as_id = [card.id for card in own_hand]
+        
+        local_team = team(self.current_player)
+        own_position_team = team(self.own_position)
+        original_hand = self.hands[self.own_position]
+        all_players = [0,1,2,3]
+        other_players = all_players.pop(self.current_player)
+
+        played_cards = []
+
+        # Set the locations of the cards in the centre
+        for index, card in enumerate(self.tricks[-1].cards):
+            # print("tricks", self.tricks[-1].cards)
+            card_location[8 * (card.id // 10) + card.id % 10][
+                4 + (self.tricks[-1].starting_player + index - self.current_player) % 4
+            ] = 1
+            played_cards.append(card.id)
+
+        # Set the locations of the cards already played
+        for trick in self.tricks[:-1]:
+            for card in trick.cards:
+                if own_position_team == local_team:
+                    if trick.winner:
+                        card_location[8 * (card.id // 10) + card.id % 10][8] = 1
+                    else:
+                        card_location[8 * (card.id // 10) + card.id % 10][9] = 1
+                else:
+                    if trick.winner:
+                        card_location[8 * (card.id // 10) + card.id % 10][9] = 1
+                    else:
+                        card_location[8 * (card.id // 10) + card.id % 10][8] = 1
+                played_cards.append(card.id)
+
+        self.tijden[1] += time.time() - now
+        now = time.time()
+
+        not_own_hand_as_id = set([suit * 10 + value for suit in range(4) for value in range(8)]) - set(own_hand_as_id) - set(played_cards)
+        possible_cards_ids = [set(id for id in not_own_hand_as_id) for _ in range(4)]
+
+
+        local_possible_cards = [set([Card(id) for id in not_own_hand_as_id]) for _ in range(4)]
+        # self.highest_trumps is the rank of potentially highest trump player could have
+        for player in range(4):
+            if player != self.current_player:
+                to_remove_suits = []
+                # start with assumption that each player has some trumps
+                trumps = True
+                for index, suit in enumerate(self.can_follow_suit[self.current_player]):
+                    if not suit:
+                        cards = [0,1,2,3,4,5,6,7]
+                        suit_base = index * 10
+                        to_remove_suits.extend([i + suit_base for i in cards])
+                        if suit == 0: # Player cant follow trump suit
+                            trumps = False
+                to_remove_suits = set(to_remove_suits)
+                
+                if self.highest_trumps[player] != 15 and trumps:
+                    ranks = [8, 9, 14, 12, 15, 10, 11, 13]
+                    to_remove_trumps = [i for i in ranks if i < self.highest_trumps[player]]
+                    card_to_rank = dict(zip(ranks,[0,1,2,3,4,5,6,7]))
+                    to_remove_trumps = set([card_to_rank.get(x, x) for x in to_remove_trumps])
+                else:
+                    to_remove_trumps = set()
+
+                possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_suits
+                local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
+            else:
+                local_possible_cards[player] = set([Card(id) for id in own_hand_as_id])
+            
+        for index, cards in enumerate(local_possible_cards):
+            for card in cards:
+                card_location[8 * (card.id // 10) + card.id % 10][(index - self.current_player) % 4] = 1
+        self.tijden[0] += time.time() - now
+
+        now = time.time()
+
+        card_location = np.where(
+            np.logical_and(card_location, np.sum(card_location, axis=1, keepdims=True) > 1),
+            card_location / np.sum(card_location, axis=1, keepdims=True),
+            card_location,
+        )
+
+        self.tijden[2] += time.time() - now
+        now = time.time()
+        if not (np.sum(card_location, axis=1) == 1).all():
+            print(card_location, flush=True)
+            print(np.sum(card_location, axis=1))
+            print(self.possible_cards, flush=True)
+            for trick in self.tricks:
+                print(trick.cards)
+            raise ValueError("Some cards are not in the array")
+
+        array = np.zeros(11, dtype=np.float16)
+
+        array[(self.tricks[-1].starting_player - self.current_player) % 4] = 1
+
+        #TODO werkt dit?
+        array[4 + self.current_player % 4] = 1
+        #array[4 + (self.current_player - self.own_position) % 4] = 1
+
+        own_team = self.current_player % 2
+
+        if self.declaring_team == own_team:
+            array[8] = 1
+        else:
+            array[8] = 0
+
+        # Set the points
+        if self.round_complete():
+            array[9] = self.final_score[own_team] / 100
+            array[10] = self.final_score[1 - own_team] / 100
+        else:
+            array[9] = (self.points[own_team] + self.meld[own_team]) / 100
+            array[10] = (self.points[1 - own_team] + self.meld[1 - own_team]) / 100
+        self.tijden[3] += time.time() - now
+        return np.concatenate((card_location.flatten(), array))
+
     def round_complete(self) -> bool:
         if len(self.hands[self.own_position]) == 0 and self.tricks[-1].trick_complete():
             return True

@@ -22,6 +22,9 @@ class MCTS_Node:
         self.q_min = -162
         self.q_max = 162
         self.root = root
+        self.can_follow_suit = [[1] * 4 for i in range(4)]
+        # highest by rank: [8, 9, 14, 12, 15, 10, 11, 13][self.value]
+        self.highest_trumps = [15,15,15,15] # Trump Jacks
 
     def __repr__(self) -> str:
         return f"Node({self.move}, {self.parent.move}, {self.score}, {self.visits})"
@@ -59,6 +62,7 @@ class MCTS_Node:
         ucbs = []
         return_nodes = []
         legal_moves = list(self.legal_moves)
+
         # Return the only legal move from the state #TODO what node to return
         if len(legal_moves) == 1:
             children_moves = []
@@ -71,6 +75,11 @@ class MCTS_Node:
         
         # model returns a distribution over 32 features, the cards
         stat = state.to_nparray_alt()
+        if(state.current_player == state.own_position):
+            stat = state.to_nparray_alt()
+        else:
+            stat = state.to_nparray_alt_op()
+
 
         value, prob_distr = model(np.array([stat])) #32 size array
         prob_distr = prob_distr.numpy().ravel().tolist()
@@ -227,6 +236,7 @@ class MCTS:
                 current_node = new_node
                 current_state.do_move(current_node.move, "mcts_move")
 
+
             self.tijden[2] += time.time() - now
             now = time.time()
             # Simulation
@@ -308,7 +318,10 @@ class MCTS:
 
         current_state = copy.deepcopy(state)
         # Team of root player
-        root_team = current_state.current_player % 2 
+        root_team = current_state.current_player % 2
+        root_player = current_state.current_player
+        root_info_suits = copy.deepcopy(state.can_follow_suit)
+        root_highest_trumps = copy.deepcopy(state.highest_trumps)
         current_node = MCTS_Node(team = root_team)
 
         for simulation in range(steps):
@@ -342,6 +355,8 @@ class MCTS:
                 new_node = current_node.expand(new_node_move)
                 current_node = new_node
                 current_node.team = current_state.current_player % 2
+                current_node.can_follow_suit = copy.deepcopy(current_state.can_follow_suit)
+                current_node.highest_trumps = copy.deepcopy(current_state.highest_trumps)
 
             self.tijden[2] += time.time() - now
             now = time.time()
@@ -355,14 +370,21 @@ class MCTS:
 
                 if self.model is not None:
                     now2 = time.time()
-                    stat = current_state.to_nparray_alt()
+                    if(current_state.current_player == root_player):
+                        stat = current_state.to_nparray_alt()
+                    else:
+                        stat = current_state.to_nparray_alt_op()
                     self.tijden2[0] += time.time() - now2
                     now2 = time.time()
                     arr = np.array([stat])
                     self.tijden2[1] += time.time() - now2
                     now2 = time.time()
                     nn_score, prob_dist = self.model(arr)
-                    nn_score = int(nn_score)
+                    if (current_state.current_player % 2 != root_team):
+                        nn_score = int(-nn_score)
+                    else:
+                        nn_score = int(nn_score)
+
                     self.tijden2[2] += time.time() - now2
                 else:
                     nn_score = 0
@@ -378,6 +400,8 @@ class MCTS:
                 current_node.score += nn_score
                 current_state.undo_move(current_node.move, True)
                 current_node = current_node.parent
+            # Reset Information Set to root set
+            state.reset_information_set(root_info_suits, root_highest_trumps)
 
             current_node.visits += 1
             current_node.score += nn_score
