@@ -351,6 +351,9 @@ class MCTS:
             now = time.time()
             # Expansion
             if not current_state.round_complete():
+                print("hierbenik")
+                print(new_node_move)
+                print(type(new_node_move))
                 current_state.do_move(new_node_move, "mcts_move")
                 new_node = current_node.expand(new_node_move)
                 current_node = new_node
