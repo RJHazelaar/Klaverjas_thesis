@@ -939,6 +939,12 @@ class State:
                 else:
                     to_remove_trumps = set()
 
+                print("current_player")
+                print(self.current_player)
+                print("to_remove_suits")
+                print(to_remove_suits)
+                print("to_remove_trumps")
+                print(to_remove_trumps)
                 possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_trumps
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
