@@ -922,7 +922,7 @@ class State:
                 to_remove_suits = []
                 # start with assumption that each player has some trumps
                 trumps = True
-                for index, suit in enumerate(self.can_follow_suit[self.current_player]):
+                for index, suit in enumerate(self.can_follow_suit[player]):
                     if not suit:
                         cards = [0,1,2,3,4,5,6,7]
                         suit_base = index * 10
@@ -939,12 +939,6 @@ class State:
                 else:
                     to_remove_trumps = set()
 
-                print("current_player")
-                print(self.current_player)
-                print("to_remove_suits")
-                print(to_remove_suits)
-                print("to_remove_trumps")
-                print(to_remove_trumps)
                 possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_trumps
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
