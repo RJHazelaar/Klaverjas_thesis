@@ -205,14 +205,13 @@ class State:
         leading_suit = self.tricks[-1].leading_suit()
         if self.current_player == self.own_position:
             # Record what information other players can infer
+            
+            # Opening card 
+            if len(self.tricks[-1] == 1):
+                return
+            
             if played_card.suit == 0:
-                print("godver")
-                print("self.tricks[-1].highest_trump().order()")
-                print(self.tricks[-1].highest_trump().order())
-                print("played_card")
-                print(played_card)
-                print("played_card.order()")
-                print(played_card.order())
+
 
                 if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
                     # update public information
