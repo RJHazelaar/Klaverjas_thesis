@@ -943,7 +943,10 @@ class State:
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
                 local_possible_cards[player] = set([Card(id) for id in own_hand_as_id])
-            
+
+        print("local_possible_cards a deuxxxx")
+        print(local_possible_cards)
+
         for index, cards in enumerate(local_possible_cards):
             for card in cards:
                 card_location[8 * (card.id // 10) + card.id % 10][(index - self.current_player) % 4] = 1
