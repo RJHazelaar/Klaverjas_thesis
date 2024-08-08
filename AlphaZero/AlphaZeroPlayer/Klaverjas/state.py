@@ -872,6 +872,11 @@ class State:
 
         played_cards = []
 
+        print("original hand")
+        print(original_hand)
+        print("current trick")
+        print(self.tricks[-1])
+
         # Set the locations of the cards in the centre
         for index, card in enumerate(self.tricks[-1].cards):
             # print("tricks", self.tricks[-1].cards)
@@ -898,11 +903,16 @@ class State:
         self.tijden[1] += time.time() - now
         now = time.time()
 
+        print("played cards")
+        print(played_cards)
+
         not_own_hand_as_id = set([suit * 10 + value for suit in range(4) for value in range(8)]) - set(own_hand_as_id) - set(played_cards)
         possible_cards_ids = [set(id for id in not_own_hand_as_id) for _ in range(4)]
 
 
         local_possible_cards = [set([Card(id) for id in not_own_hand_as_id]) for _ in range(4)]
+        print("local_possible_cards")
+        print(local_possible_cards)
         # self.highest_trumps is the rank of potentially highest trump player could have
         for player in range(4):
             if player != self.current_player:
@@ -920,13 +930,13 @@ class State:
                 
                 if self.highest_trumps[player] != 15 and trumps:
                     ranks = [8, 9, 14, 12, 15, 10, 11, 13]
-                    to_remove_trumps = [i for i in ranks if i < self.highest_trumps[player]]
+                    to_remove_trumps = [i for i in ranks if i > self.highest_trumps[player]]
                     card_to_rank = dict(zip(ranks,[0,1,2,3,4,5,6,7]))
                     to_remove_trumps = set([card_to_rank.get(x, x) for x in to_remove_trumps])
                 else:
                     to_remove_trumps = set()
 
-                possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_suits
+                possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_trumps
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
                 local_possible_cards[player] = set([Card(id) for id in own_hand_as_id])
