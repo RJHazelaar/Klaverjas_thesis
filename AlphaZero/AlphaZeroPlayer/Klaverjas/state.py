@@ -211,8 +211,6 @@ class State:
                 return
             
             if played_card.suit == 0:
-
-
                 if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
                     # update public information
                     self.highest_trumps[self.current_player] = played_card.order()
@@ -871,11 +869,16 @@ class State:
         other_players = all_players.pop(self.current_player)
 
         played_cards = []
+        print("current_player")
+        print(self.current_player)
 
         print("original hand")
         print(original_hand)
         print("current trick")
         print(self.tricks[-1])
+
+        print("can follow suit")
+        print(self.can_follow_suit)
 
         # Set the locations of the cards in the centre
         for index, card in enumerate(self.tricks[-1].cards):
