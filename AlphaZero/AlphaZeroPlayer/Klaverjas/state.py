@@ -916,6 +916,10 @@ class State:
         local_possible_cards = [set([Card(id) for id in not_own_hand_as_id]) for _ in range(4)]
         print("local_possible_cards")
         print(local_possible_cards)
+
+        print("self.highest_trumps")
+        print(self.highest_trumps)
+
         # self.highest_trumps is the rank of potentially highest trump player could have
         for player in range(4):
             if player != self.current_player:
@@ -932,6 +936,8 @@ class State:
                 to_remove_suits = set(to_remove_suits)
                 
                 if self.highest_trumps[player] != 15 and trumps:
+                    #        7, 8,  9, 10,  J,  Q,  K,  A
+                    #        0, 1,  2,  3,  4,  6,  7,  8
                     ranks = [8, 9, 14, 12, 15, 10, 11, 13]
                     to_remove_trumps = [i for i in ranks if i > self.highest_trumps[player]]
                     card_to_rank = dict(zip(ranks,[0,1,2,3,4,5,6,7]))
@@ -939,6 +945,10 @@ class State:
                 else:
                     to_remove_trumps = set()
 
+                print("player")
+                print(player)
+                print("to_remove_trumps")
+                print(to_remove_trumps)
                 possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_trumps
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
