@@ -207,7 +207,7 @@ class State:
             # Record what information other players can infer
             
             # Opening card 
-            if (len(self.tricks[-1]) == 1):
+            if (len(self.tricks[-1].cards) == 1):
                 return
             
             if played_card.suit == 0:
