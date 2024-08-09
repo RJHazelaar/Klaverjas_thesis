@@ -325,7 +325,7 @@ class MCTS:
         current_node = MCTS_Node(team = root_team)
 
         for simulation in range(steps):
-
+            current_state.reset_information_set(root_info_suits, root_highest_trumps)
             now = time.time()
             # Determination
             current_state.set_determinization()
@@ -402,7 +402,7 @@ class MCTS:
                 current_node = current_node.parent
             # Reset Information Set to root set
             print("MCTS step: ", simulation)
-            state.reset_information_set(root_info_suits, root_highest_trumps)
+
 
             current_node.visits += 1
             current_node.score += nn_score

@@ -203,12 +203,11 @@ class State:
             self.possible_cards[player].discard(played_card)
 
         leading_suit = self.tricks[-1].leading_suit()
+        if leading_suit is None:
+            return
+ 
         if self.current_player == self.own_position:
             # Record what information other players can infer
-            
-            # Opening card 
-            if (len(self.tricks[-1].cards) == 0):
-                return
             
             if played_card.suit == 0:
                 if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
@@ -223,8 +222,7 @@ class State:
                     self.can_follow_suit[self.current_player][0] = 0
             return
 
-        if leading_suit is None:
-            return
+
 
         if played_card.suit == 0:
             if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
