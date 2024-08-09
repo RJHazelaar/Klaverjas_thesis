@@ -265,8 +265,22 @@ class State:
                 self.possible_cards[self.current_player] -= cards_to_remove
 
     def reset_information_set(self, info_suits, highest_trumps):
+        print("info_suits")
+        print(info_suits)
+        print("highest trumps")
+        print(highest_trumps)
+        print("self.can_follow_suit")
+        print(self.can_follow_suit)
+        print("self.highest_trumps")
+        print(self.highest_trumps)
         self.can_follow_suit = copy.deepcopy(info_suits)
         self.highest_trumps = copy.deepcopy(highest_trumps)
+        print("NU GERESETTED????")
+        print("self.can_follow_suit")
+        print(self.can_follow_suit)
+        print("self.highest_trumps")
+        print(self.highest_trumps)
+
         return
 
     def legal_moves(self) -> set[Card]:
