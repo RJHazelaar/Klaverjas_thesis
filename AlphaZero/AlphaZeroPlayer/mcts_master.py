@@ -401,6 +401,7 @@ class MCTS:
                 current_state.undo_move(current_node.move, True)
                 current_node = current_node.parent
             # Reset Information Set to root set
+            print("MCTS step: ", simulation)
             state.reset_information_set(root_info_suits, root_highest_trumps)
 
             current_node.visits += 1
