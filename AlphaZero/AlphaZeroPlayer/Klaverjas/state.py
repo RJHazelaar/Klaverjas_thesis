@@ -275,6 +275,10 @@ class State:
         print(self.highest_trumps)
         self.can_follow_suit = copy.deepcopy(info_suits)
         self.highest_trumps = copy.deepcopy(highest_trumps)
+        for index_i, i in enumerate(info_suits):
+            self.highest_trumps[index_i] = highest_trumps[index_i]
+            for index_j, j in enumerate(highest_trumps):
+                self.can_follow_suit[index_i][index_j] = info_suits[index_i][index_j]
         print("NU GERESETTED????")
         print("self.can_follow_suit")
         print(self.can_follow_suit)
