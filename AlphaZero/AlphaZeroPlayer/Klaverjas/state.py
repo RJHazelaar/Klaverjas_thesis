@@ -212,7 +212,7 @@ class State:
             if played_card.suit == 0:
                 if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
                     # update public information
-                    self.highest_trumps[self.current_player] = played_card.order()
+                    self.highest_trumps[self.current_player] = highest_trump_order
             if played_card.suit != leading_suit:
                 # update public information
                 self.can_follow_suit[self.current_player][leading_suit] = 0
@@ -227,7 +227,7 @@ class State:
         if played_card.suit == 0:
             if (highest_trump_order := self.tricks[-1].highest_trump().order()) > played_card.order():
                 # update public information
-                self.highest_trumps[self.current_player] = played_card.order()
+                self.highest_trumps[self.current_player] = highest_trump_order
                 # remove all trump cards higher then the highest trump card from the current player
                 cards_to_remove = {
                     card
