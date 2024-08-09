@@ -401,8 +401,6 @@ class MCTS:
                 current_state.undo_move(current_node.move, True)
                 current_node = current_node.parent
             # Reset Information Set to root set
-            print("MCTS step: ", simulation)
-
 
             current_node.visits += 1
             current_node.score += nn_score

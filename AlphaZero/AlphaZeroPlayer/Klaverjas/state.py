@@ -263,25 +263,13 @@ class State:
                 self.possible_cards[self.current_player] -= cards_to_remove
 
     def reset_information_set(self, info_suits, highest_trumps):
-        print("info_suits")
-        print(info_suits)
-        print("highest trumps")
-        print(highest_trumps)
-        print("self.can_follow_suit")
-        print(self.can_follow_suit)
-        print("self.highest_trumps")
-        print(self.highest_trumps)
+
         self.can_follow_suit = copy.deepcopy(info_suits)
         self.highest_trumps = copy.deepcopy(highest_trumps)
         for index_i, i in enumerate(info_suits):
             self.highest_trumps[index_i] = highest_trumps[index_i]
             for index_j, j in enumerate(highest_trumps):
                 self.can_follow_suit[index_i][index_j] = info_suits[index_i][index_j]
-        print("NU GERESETTED????")
-        print("self.can_follow_suit")
-        print(self.can_follow_suit)
-        print("self.highest_trumps")
-        print(self.highest_trumps)
 
         return
 
@@ -885,19 +873,7 @@ class State:
         other_players = all_players.pop(self.current_player)
 
         played_cards = []
-        print("current_player")
-        print(self.current_player)
-
-        print("original hand")
-        print(original_hand)
-        print("current trick")
-        print(self.tricks[-1])
-
-        print("can follow suit")
-        print(self.can_follow_suit)
-
-        print("own hand")
-        print(own_hand)
+       
         # Set the locations of the cards in the centre
         for index, card in enumerate(self.tricks[-1].cards):
             # print("tricks", self.tricks[-1].cards)
@@ -924,19 +900,12 @@ class State:
         self.tijden[1] += time.time() - now
         now = time.time()
 
-        print("played cards")
-        print(played_cards)
 
         not_own_hand_as_id = set([suit * 10 + value for suit in range(4) for value in range(8)]) - set(own_hand_as_id) - set(played_cards)
         possible_cards_ids = [set(id for id in not_own_hand_as_id) for _ in range(4)]
 
 
         local_possible_cards = [set([Card(id) for id in not_own_hand_as_id]) for _ in range(4)]
-        print("local_possible_cards")
-        print(local_possible_cards)
-
-        print("self.highest_trumps")
-        print(self.highest_trumps)
 
         # self.highest_trumps is the rank of potentially highest trump player could have
         for player in range(4):
@@ -963,17 +932,10 @@ class State:
                 else:
                     to_remove_trumps = set()
 
-                print("player")
-                print(player)
-                print("to_remove_trumps")
-                print(to_remove_trumps)
                 possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_trumps
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
                 local_possible_cards[player] = set([Card(id) for id in own_hand_as_id]) #deze?
-
-        print("local_possible_cards a deuxxxx")
-        print(local_possible_cards)
 
         for index, cards in enumerate(local_possible_cards):
             for card in cards:
