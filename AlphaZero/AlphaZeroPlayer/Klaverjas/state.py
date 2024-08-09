@@ -898,6 +898,8 @@ class State:
         print("can follow suit")
         print(self.can_follow_suit)
 
+        print("own hand")
+        print(own_hand)
         # Set the locations of the cards in the centre
         for index, card in enumerate(self.tricks[-1].cards):
             # print("tricks", self.tricks[-1].cards)
@@ -970,7 +972,7 @@ class State:
                 possible_cards_ids[player] = possible_cards_ids[player] - to_remove_suits - to_remove_trumps
                 local_possible_cards[player] = set([Card(id) for id in possible_cards_ids[player]])
             else:
-                local_possible_cards[player] = set([Card(id) for id in own_hand_as_id])
+                local_possible_cards[player] = set([Card(id) for id in own_hand_as_id]) #deze?
 
         print("local_possible_cards a deuxxxx")
         print(local_possible_cards)
