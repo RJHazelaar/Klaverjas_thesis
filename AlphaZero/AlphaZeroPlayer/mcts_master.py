@@ -426,7 +426,7 @@ class MCTS:
                     moves.append(legal_m)
                     visits.append(0)
 
-        if training == True:
+        if training == True and 1 == 0:
             visits = np.array(visits) + int(self.mcts_steps * extra_noise_ratio)
             probabilities = visits / np.sum(visits)
             best_move = np.random.choice(moves, p=probabilities)
