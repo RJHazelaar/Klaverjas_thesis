@@ -9,12 +9,60 @@ def other_team(player):
     return (player + 1) % 2
 
 class Round:
-    def __init__(self, starting_player, trump_suit, declarer, model=None, **kwargs):
+    def __init__(self, starting_player, trump_suit, declarer, model=None, alternate_model=None, **kwargs):
         self.starting_player = starting_player
         self.current_player = starting_player
         self.declarer = declarer
         self.bidders = [0,0,0,0] # Player that did a bid
         self.passes = 0
+        if alternate_model is not None:
+            options = ["k","h","r","s","p"]
+            self.trump_suit = "k"
+            declarer = starting_player
+            self.tricks = [Trick(starting_player)]
+            self.points = [0,0]
+            self.meld = [0, 0]
+
+            self.cardsleft = [[i for i in range(7,15)] for j in range(4)]
+            for i in range(4):
+                if ["k", "h", "r", "s"][i] == self.trump_suit:
+                    order = [8, 9, 14, 12, 15, 10, 11, 13]
+                else:
+                    order = [0, 1, 2, 6, 3, 4, 5, 7]
+                ordered_list = [i for _, i in sorted(zip(order, self.cardsleft[i]))]
+                self.cardsleft[i] = ordered_list
+                
+            self.deal()               
+
+            # NEURAL NETWORK
+            # TODO Vectorize to output all players simulteneously
+            bidding_order = list(range(declarer, 4)) + list(range(0, declarer))
+            for bidder in bidding_order:
+                trump_scores = []
+                possible_trump_suit = "k"
+                for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
+                    input_vector = self.hand_to_input_vector(bidder, starting_player)
+                    output, policy = alternate_model(input_vector)
+                    self.bidders[bidder] = 1
+                    trump_scores.append(output)
+                
+                possible_trump_suit = options[np.argmax(trump_scores)]
+                # If player predicts a win by a slight margin
+                if trump_scores[np.argmax(trump_scores)] > 10:
+                    self.declarer = bidder
+                    self.trump_suit = possible_trump_suit
+                    break
+                else:
+                    self.passes += 1
+                    self.trump_suit = "p"
+            
+            if self.trump_suit == "p": # First declarer forced to make a decision != passing
+                output = model(input_vector)[:-1]
+                self.trump_suit = options[np.argmax(output)] #TODO Just use the previous output
+            # NEURAL NETWORK
+
+            self.declaring_team = team(self.declarer)
+
         if model is not None:
             options = ["k","h","r","s","p"]
             self.trump_suit = "k"

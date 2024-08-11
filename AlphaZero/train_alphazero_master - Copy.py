@@ -52,7 +52,6 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
     alpha_player_2 = AlphaZero_player_master(2, mcts_params, model)
     alpha_player_3 = AlphaZero_player_master(3, mcts_params, model)
 
-
     for round_num in range(num_rounds):
         starting_player = declarer = random.choice([0, 1, 2, 3])
         round = Round(starting_player, random.choice(["k", "h", "r", "s"]), declarer, bidding_model)
@@ -194,7 +193,6 @@ def train(
     fit_params,
     test_params,
     extra_noise_ratio,
-    jumpstart,
 ):
     start_time = time.time()
     total_selfplay_time = 0
@@ -207,12 +205,9 @@ def train(
     test_frequency = test_params["test_frequency"]
     test_mcts_params = test_params["mcts_params"]
 
-    if step == 0 and jumpstart == 0:
+    if step == 0:
         memory = None
         bidding_memory = None
-    elif step == 0:
-        memory = np.load(f"{data_dir}/Data/RL_data/{model_name}/{model_name}_{jumpstart}_memory.npy")
-        bidding_memory = np.load(f"{data_dir}/Data/RL_data/{bidding_model_name}/{bidding_model_name}_{jumpstart}_memory.npy")
     else:
         memory = np.load(f"{data_dir}/Data/RL_data/{model_name}/{model_name}_{step}_memory.npy")
         #memory = np.load(f"{parent_dir}/Data/RL_data/{model_name}/{model_name}_{step}_memory.npy")

@@ -5,7 +5,7 @@ import time
 import sys
 
 from AlphaZero.train_alphazero_master import train
-from AlphaZero.AlphaZeroPlayer.networks import create_simple_nn, create_normal_two_headed_nn, create_bidding_nn, create_bidding_nn_alt
+from AlphaZero.AlphaZeroPlayer.networks import create_simple_nn, create_normal_two_headed_nn, create_bidding_nn
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
 data_dir = "/local/s1762508"
@@ -36,7 +36,6 @@ def run_train(
     training_size_multiplier = fit_params["training_size_multiplier"]
     mcts_params = selfplay_params["mcts_params"]
     max_memory_multiplier = selfplay_params["max_memory_multiplier"]
-    jumpstart =  run_settings["jumpstart"]
 
     test_params["test_rounds"] = (
         math.ceil(test_params["test_rounds"] / n_cores) * n_cores
@@ -115,7 +114,6 @@ def run_train(
         fit_params,
         test_params,
         extra_noise_ratio,
-        jumpstart,
     )
     print("total time:", total_time)
     print("selfplay time:", selfplay_time)
@@ -143,7 +141,6 @@ def main():
         "budget": 8,  # hours
         "multiprocessing": True, #TODO
         "n_cores": n_cores,
-        "jumpstart": 114,
     }
     model_params = {
         "model_type": "two_headed",
