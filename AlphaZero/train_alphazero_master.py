@@ -221,8 +221,12 @@ def train(
 
     early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", verbose=0, restore_best_weights=True)
     wandb.log({"Average Score": -35, "Train Time": 0})
-    model_path = f"{model_name}/{model_name}_{step}.h5"
-    bidding_model_path = f"{bidding_model_name}/{bidding_model_name}_{step}.h5"
+    if jumpstart != 0:
+        model_path = f"{model_name}/{model_name}_{jumpstart}.h5"
+        bidding_model_path = f"{bidding_model_name}/{bidding_model_name}_{jumpstart}.h5"
+    else:
+        model_path = f"{model_name}/{model_name}_{step}.h5"
+        bidding_model_path = f"{bidding_model_name}/{bidding_model_name}_{step}.h5"
 
     while time.time() - start_time < budget:
         step += 1
