@@ -211,8 +211,8 @@ def train(
         memory = None
         bidding_memory = None
     elif step == 0:
-        memory = np.load(f"{data_dir}/Data/RL_data/{model_name}/{model_name}_{jumpstart}_memory.npy")
-        bidding_memory = np.load(f"{data_dir}/Data/RL_data/{bidding_model_name}/{bidding_model_name}_{jumpstart}_memory.npy")
+        memory = np.load(f"{data_dir}/Data/RL_data/{model_name}/{model_name}_{jumpstart}.npy")
+        bidding_memory = np.load(f"{data_dir}/Data/RL_data/{bidding_model_name}/{bidding_model_name}_{jumpstart}.npy")
     else:
         memory = np.load(f"{data_dir}/Data/RL_data/{model_name}/{model_name}_{step}_memory.npy")
         #memory = np.load(f"{parent_dir}/Data/RL_data/{model_name}/{model_name}_{step}_memory.npy")
