@@ -24,7 +24,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
 sys.path.append(parent_dir)
 data_dir = parent_dir+"/Klaverjas_thesis-main/Data/SL_Data/originalDB.csv"
-model_path = parent_dir+"/Klaverjas_thesis-main/bidding_network_651.h5"
+model_path = parent_dir+"/Klaverjas_thesis/bidding_network_policy_103.h5"
 
 def validation_test(num_rounds: int, model_paths):
     # random.seed(13)
@@ -43,6 +43,7 @@ def validation_test(num_rounds: int, model_paths):
         "ucb_c": 200,
     }
 
+    print(model_paths[0])
     model = None
     if model_paths[0] is not None:
         try:
