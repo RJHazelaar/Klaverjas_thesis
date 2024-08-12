@@ -147,6 +147,9 @@ class Round:
         addition_trump = [0, 30, 20, 10][trump_list.index(trump)]
         all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
         declarer_hand = self.player_hands[declarer]
+        declarer_hand_id = []
+        for card in declarer_hand:
+            declarer_hand_id.append(card.id)
         declarer_hand_trump = [(x+addition_trump)%40 for x in declarer_hand]
         input_vector = np.in1d(all_cards, declarer_hand_trump).astype(int)
 
