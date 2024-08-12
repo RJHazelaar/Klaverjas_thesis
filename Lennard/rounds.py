@@ -150,7 +150,7 @@ class Round:
         declarer_hand_id = []
         for card in declarer_hand:
             declarer_hand_id.append(card.id)
-        declarer_hand_trump = [(x+addition_trump)%40 for x in declarer_hand]
+        declarer_hand_trump = [(x+addition_trump)%40 for x in declarer_hand_id]
         input_vector = np.in1d(all_cards, declarer_hand_trump).astype(int)
 
         
