@@ -149,4 +149,5 @@ def create_bidding_nn_alt(learning_rate, l1, l2):
     # define how to train the model
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss="mse")
     model.build(input_shape=(1, 36))
-    
+
+    return model
