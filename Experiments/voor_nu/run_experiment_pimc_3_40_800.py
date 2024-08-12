@@ -27,7 +27,7 @@ def run_test():
     opponent = "pimc"
     multiprocessing = True #TODO
 
-    num_rounds = 2500
+    num_rounds = 3500
     num_rounds = (
         math.ceil(num_rounds / n_cores) * n_cores
     )  # make sure rounds is divisible by n_cores and not devide to 0
@@ -75,7 +75,7 @@ def run_test():
     )
 
     scores_per_round = np.array(scores_round)
-    np.savetxt('run_experiment_pimc_3_40_800.py', scores_per_round)
+    np.savetxt('run_experiment_pimc_3_40_800.txt', scores_per_round)
 
 if __name__ == "__main__":
     start_time = time.time()

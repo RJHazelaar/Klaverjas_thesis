@@ -14,7 +14,7 @@ def run_test():
         n_cores = int(os.environ["SLURM_JOB_CPUS_PER_NODE"])
         cluster = "cluster"
     except:
-        n_cores = 10
+        n_cores = 20
         cluster = "local"
 
     #TODO Klopt dit????
@@ -70,6 +70,8 @@ def run_test():
         alpha_eval_time,
     )
 
+    scores_per_round = np.array(scores_round)
+    np.savetxt('run_experiment_alphazero_3.txt', scores_per_round)
 
 if __name__ == "__main__":
     start_time = time.time()
