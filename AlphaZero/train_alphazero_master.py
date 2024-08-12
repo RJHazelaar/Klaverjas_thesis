@@ -44,8 +44,8 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
     y_train_policy = np.zeros((num_rounds * 36, 32), dtype=np.float16)
 
     # 4 players that can bid, 32 cards + 4 one hot encoded player
-    X_train_bid = np.zeros((num_rounds * 4, 36), dtype=np.float16)
-    y_train_bid = np.zeros((num_rounds * 4, 5), dtype=np.float16)
+    X_train_bid = np.zeros((num_rounds, 36), dtype=np.float16)
+    y_train_bid = np.zeros((num_rounds, 1), dtype=np.float16)
 
     alpha_player_0 = AlphaZero_player_master(0, mcts_params, model)
     alpha_player_1 = AlphaZero_player_master(1, mcts_params, model)
@@ -55,12 +55,10 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
 
     for round_num in range(num_rounds):
         starting_player = declarer = random.choice([0, 1, 2, 3])
-        round = Round(starting_player, random.choice(["k", "h", "r", "s"]), declarer, bidding_model)
+        round = Round(starting_player, random.choice(["k", "h", "r", "s"]), declarer, bidding_model, alt_bidding_model=True)
         
-        X_train_bid[round_num * 4] = round.hand_to_input_vector(0, starting_player)
-        X_train_bid[round_num * 4 + 1] = round.hand_to_input_vector(1, starting_player)
-        X_train_bid[round_num * 4 + 2] = round.hand_to_input_vector(2, starting_player)
-        X_train_bid[round_num * 4 + 3] = round.hand_to_input_vector(3, starting_player)
+        X_train_bid[round_num] = round.hand_to_input_vector_alt(round.trump_suit, round.declarer, starting_player)
+
 
         alpha_player_0.new_round_Round(round)
         alpha_player_1.new_round_Round(round)
@@ -122,16 +120,21 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
             y_train_value[round_num * 36 + trick * 4 + 2] = score_player_2
             y_train_value[round_num * 36 + trick * 4 + 3] = score_player_3
 
-        for bidder, player in zip(round.bidders, [0,1,2,3]):
-            X_train_bid[round_num * 4 + player] = X_train_bid[round_num * 4 + player] * bidder
-            y_train_bid[round_num * 4 + player] = alpha_player_0.state.get_prediction_score(0, round.declarer, round.trump_suit) * bidder
+        # Did declaring team get more points than opponents
+        team_declarer = int(round.declarer % 2)
+        team_winner = int(score_player_1 > score_player_0)
+        y_train_bid[round_num] = int((team_declarer == team_winner))
+        #for bidder, player in zip(round.bidders, [0,1,2,3]):
+        #    X_train_bid[round_num * 4 + player] = X_train_bid[round_num * 4 + player] * bidder
+        #    y_train_bid[round_num * 4 + player] = alpha_player_0.state.get_prediction_score(0, round.declarer, round.trump_suit) * bidder
+        print("Scores: ", score_player_0, ", ", score_player_1)
 
     y_train = np.concatenate((y_train_value, y_train_policy), axis=1)
     train_data = np.concatenate((X_train, y_train), axis=1)
 
     # First remove bidding training data for players that didnt bid
-    X_train_bid = X_train_bid[~np.all(X_train_bid == 0, axis=1)]
-    y_train_bid = y_train_bid[~np.all(y_train_bid == 0, axis=1)]
+    #X_train_bid = X_train_bid[~np.all(X_train_bid == 0, axis=1)]
+    #y_train_bid = y_train_bid[~np.all(y_train_bid == 0, axis=1)]
     train_data_bidding = np.concatenate((X_train_bid, y_train_bid), axis=1)
     return train_data, train_data_bidding
 

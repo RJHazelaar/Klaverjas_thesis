@@ -95,6 +95,8 @@ def run_train(
             print("\n\n\n============bidding model already exists============\n\n\n")
         if bidding_model_params["model_type"] == "bidding":
             bidding_model = create_bidding_nn(learning_rate_bidding, l1_bidding, l2_bidding)
+        elif bidding_model_params["model_type"] == "bidding_alt":
+            bidding_model = create_bidding_nn_alt(learning_rate_bidding, l1_bidding, l2_bidding)
         else:
             raise Exception("model type not recognized")
 
@@ -152,7 +154,7 @@ def main():
         "l2": 0.01,
     }
     bidding_model_params = {
-        "model_type": "bidding",
+        "model_type": "bidding_alt",
         "learning_rate": 0.01,
         "l1": 0.01,
         "l2": 0.01,
