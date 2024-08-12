@@ -24,7 +24,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
 sys.path.append(parent_dir)
 data_dir = parent_dir+"/Klaverjas_thesis-main/Data/SL_Data/originalDB.csv"
-model_path = parent_dir+"/Klaverjas_thesis/bidding_network_policy_103.h5"
+model_path = parent_dir+"/Klaverjas_thesis/Experiments/voor_nu/bidding_network_policy_113.h5"
 
 def validation_test(num_rounds: int, model_paths):
     # random.seed(13)
@@ -62,7 +62,7 @@ def validation_test(num_rounds: int, model_paths):
         round = Round(rounds.loc[round_num]["FirstPlayer"], rounds.loc[round_num]["Troef"][0], rounds.loc[round_num]["Gaat"])
         round.set_cards(rounds.loc[round_num]["Cards"])
         
-        options = ["k","h","r","s","p"]
+        options = ["k","h","r","s"]
         trump_from_data = round.trump_suit
         declarer_from_data = round.declarer
 
@@ -73,25 +73,41 @@ def validation_test(num_rounds: int, model_paths):
         declarer = round.starting_player
         starting_player = round.starting_player
 
+        #print(f"Ground truth from data, trump: {trump_from_data}, declarer{declarer_from_data}")
+        #print(f"Predictions from network, trump: {predicted_trump}, declarer{predicted_declarer}")
+
+        passes = 0
         bidding_order = list(range(declarer, 4)) + list(range(0, declarer))
         for bidder in bidding_order:
-            input_vector = round.hand_to_input_vector(bidder, starting_player)
-            output = model(input_vector)
-            possible_trump_suit = options[np.argmax(output)] 
-            if possible_trump_suit != "p":
+            trump_scores = []
+            possible_trump_suit = "k"
+            for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
+                input_vector = round.hand_to_input_vector_alt(trump, bidder, starting_player)
+                output = model(input_vector)
+
+                trump_scores.append(output)
+            
+            possible_trump_suit = options[np.argmax(trump_scores)]
+            # If player predicts a win by a slight margin
+            if trump_scores[np.argmax(trump_scores)] > 0:
                 predicted_declarer = bidder
                 predicted_trump = possible_trump_suit
                 break
+            else:
+                passes += 1
+
         
-        if predicted_trump == "p": # First declarer forced to make a decision != passing
-            output = model(input_vector)[:-1]
-            predicted_trump = options[np.argmax(output)] #TODO Just use the previous output
-        # NEURAL NETWORK
-        #print(f"Ground truth from data, trump: {trump_from_data}, declarer{declarer_from_data}")
-        #print(f"Predictions from network, trump: {predicted_trump}, declarer{predicted_declarer}")
+        if passes == 4: # First declarer forced to make a decision, can't pass
+            trump_scores = []
+            for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
+                input_vector = round.hand_to_input_vector_alt(trump, bidder, starting_player)
+                output = model(input_vector)
+                trump_scores.append(output)
+            
+            predicted_trump = options[np.argmax(trump_scores)] #TODO Just use the previous output
+
         if trump_from_data == predicted_trump and declarer_from_data == predicted_declarer:
             right_predictions += 1 
-
 
     return right_predictions / total_rounds
 

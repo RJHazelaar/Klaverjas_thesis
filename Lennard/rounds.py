@@ -56,8 +56,9 @@ class Round:
                 else:
                     self.passes += 1
 
-            
+
             if self.passes == 4: # First declarer forced to make a decision, can't pass
+                bidder = starting_player
                 trump_scores = []
                 for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
                     input_vector = self.hand_to_input_vector_alt(trump, bidder, starting_player)
@@ -65,8 +66,7 @@ class Round:
                     self.bidders[bidder] = 1
                     trump_scores.append(output)
                 
-                possible_trump_suit = options[np.argmax(trump_scores)]
-                self.trump_suit = options[np.argmax(output)] #TODO Just use the previous output
+                self.trump_suit = options[np.argmax(trump_scores)] #TODO Just use the previous output
                 # original declarer == 5th declarer == starting_player
             # NEURAL NETWORK
 
