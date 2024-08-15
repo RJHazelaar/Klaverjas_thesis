@@ -142,7 +142,7 @@ def main():
         "model_name": model_name,
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
-        "budget": 8,  # hours
+        "budget": 12,  # hours
         "multiprocessing": True, #TODO
         "n_cores": n_cores,
         "jumpstart": 0,
@@ -165,7 +165,7 @@ def main():
         "extra_noise_ratio": 0.1,  # when training extra_noise_ratio * mcts_steps is added to all visit counts
         "mcts_params": {
             "mcts_steps": 100,
-            "n_of_sims": 2,
+            "n_of_sims": 1,
             "nn_scaler": 0,
             "ucb_c": 1.25,
             "steps_per_determinization": 25,
