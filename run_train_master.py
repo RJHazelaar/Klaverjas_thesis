@@ -165,7 +165,7 @@ def main():
         "extra_noise_ratio": 0.1,  # when training extra_noise_ratio * mcts_steps is added to all visit counts
         "mcts_params": {
             "mcts_steps": 100,
-            "n_of_sims": 0,
+            "n_of_sims": 2,
             "nn_scaler": 0,
             "ucb_c": 1.25,
             "steps_per_determinization": 25,
