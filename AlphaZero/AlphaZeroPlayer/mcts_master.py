@@ -364,10 +364,6 @@ class MCTS:
             if not current_state.round_complete():
                 sim_score = 0
 
-                # Average the score
-                if self.n_of_sims > 0:
-                    sim_score /= self.n_of_sims
-
                 if self.model is not None:
                     now2 = time.time()
                     if(current_state.current_player == root_player):
@@ -384,10 +380,33 @@ class MCTS:
                         nn_score = int(-nn_score)
                     else:
                         nn_score = int(nn_score)
-
                     self.tijden2[2] += time.time() - now2
-                else:
-                    nn_score = 0
+
+                if self.nn_scaler < 1: 
+                    for _ in range(self.n_of_sims):
+                        children = []
+
+                        # Do random moves until round is complete
+                        while not current_state.round_complete():
+
+                            move = random.choice(list(current_state.legal_moves()))
+                            children.append(move)
+                            current_state.do_move(move, "simulation")
+
+                        # Add score to points
+                        sim_score += current_state.get_score(self.player_position) # Score from perspective of root node player
+
+                        # Undo moves
+                        children.reverse()
+                        for move in children:
+                            current_state.undo_move(move, False)                
+                
+                # Average the score
+                if self.n_of_sims > 0:
+                    sim_score /= self.n_of_sims
+
+
+
             else:
                 sim_score = current_state.get_score(self.player_position)
                 nn_score = sim_score
@@ -397,7 +416,7 @@ class MCTS:
             # Backpropagation
             while current_node.parent is not None:
                 current_node.visits += 1
-                current_node.score += nn_score
+                current_node.score += (1 - self.nn_scaler) * sim_score + self.nn_scaler * nn_score
                 current_state.undo_move(current_node.move, True)
                 current_node = current_node.parent
             # Reset Information Set to root set

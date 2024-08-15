@@ -145,19 +145,19 @@ def main():
         "budget": 8,  # hours
         "multiprocessing": True, #TODO
         "n_cores": n_cores,
-        "jumpstart": 113,
+        "jumpstart": 0,
     }
     model_params = {
         "model_type": "two_headed",
         "learning_rate": 0.01,
-        "l1": 0.01,
-        "l2": 0.01,
+        "l1": 0.001,
+        "l2": 0.001,
     }
     bidding_model_params = {
         "model_type": "bidding_alt",
         "learning_rate": 0.01,
-        "l1": 0.01,
-        "l2": 0.01,
+        "l1": 0.001,
+        "l2": 0.001,
     }
     selfplay_params = {
         "rounds_per_step": 40,  # amount of selfplay rounds per step
@@ -166,7 +166,7 @@ def main():
         "mcts_params": {
             "mcts_steps": 100,
             "n_of_sims": 0,
-            "nn_scaler": 1,
+            "nn_scaler": 0,
             "ucb_c": 1.25,
             "steps_per_determinization": 25,
         },

@@ -307,7 +307,7 @@ def train(
         train_bidding_nn(bidding_train_data, bidding_model, fit_params, [early_stopping])
         training_time = time.time() - tijd
         bidding_model_path = f"{bidding_model_name}/{bidding_model_name}_{step}.h5"
-        if step == 80:
+        if step == 120:
             tf.keras.backend.set_value(
                 bidding_model.optimizer.learning_rate,
                 tf.keras.backend.get_value(bidding_model.optimizer.learning_rate) / 10,
@@ -331,6 +331,9 @@ def train(
             )
         total_testing_time += time.time() - tijd
 
+        nn_scaler_frequency = 30
+        if step % nn_scaler_frequency == 0 and mcts_params["mcts_params"]["nn_scaler"] < 1:
+            mcts_params["mcts_params"]["nn_scaler"] += 0.2_
     # always test at the end
     if step % test_frequency != 0:
         scores_round, _, _ = run_test_multiprocess(
