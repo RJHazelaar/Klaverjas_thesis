@@ -333,7 +333,7 @@ def train(
 
         nn_scaler_frequency = 30
         if step % nn_scaler_frequency == 0 and mcts_params["mcts_params"]["nn_scaler"] < 1:
-            mcts_params["mcts_params"]["nn_scaler"] += 0.2_
+            mcts_params["mcts_params"]["nn_scaler"] += 0.2
     # always test at the end
     if step % test_frequency != 0:
         scores_round, _, _ = run_test_multiprocess(
