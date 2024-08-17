@@ -178,7 +178,7 @@ def main():
     }
     test_params = {
         "test_rounds": 10000,
-        "test_frequency":40,
+        "test_frequency":60,
         "mcts_params": {
             "mcts_steps": 10,
             "n_of_sims": 0,
