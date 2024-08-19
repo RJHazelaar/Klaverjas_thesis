@@ -164,15 +164,15 @@ def main():
         "max_memory_multiplier": 10,  # memory size = rounds_per_step * 36 * max_memory_multiplier
         "extra_noise_ratio": 0.1,  # when training extra_noise_ratio * mcts_steps is added to all visit counts
         "mcts_params": {
-            "mcts_steps": 100,
+            "mcts_steps": 200,
             "n_of_sims": 1,
             "nn_scaler": 0,
-            "ucb_c": 1.25,
-            "steps_per_determinization": 25,
+            "ucb_c": 1.4,
+            "steps_per_determinization": 40,
         },
     }
     fit_params = {
-        "training_size_multiplier": 1,  # training size = training_size_multiplier * rounds_per_step * 36
+        "training_size_multiplier": 3,  # training size = training_size_multiplier * rounds_per_step * 36
         "epochs": 1,
         "batch_size": 2048,
     }
@@ -183,7 +183,7 @@ def main():
             "mcts_steps": 10,
             "n_of_sims": 0,
             "nn_scaler": 1,
-            "ucb_c": 1.25,
+            "ucb_c": 1.4,
             "steps_per_determinization": 10,
         },
     }

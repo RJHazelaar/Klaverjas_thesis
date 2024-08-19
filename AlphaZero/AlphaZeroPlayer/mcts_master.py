@@ -99,7 +99,7 @@ class MCTS_Node:
 
         # Add Dirichlet noise for added exploration from root during training
         if self.root:
-            dirichlet_alpha = 0.3
+            dirichlet_alpha = 0.03
             dirichlet_epsilon = 0.25
             dirichlet_noise = [dirichlet_alpha] * len(probabilities_legal)
             for index, prob in enumerate(probabilities_legal):
