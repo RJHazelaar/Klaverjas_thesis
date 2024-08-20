@@ -277,9 +277,15 @@ def train(
             bidding_memory = np.delete(bidding_memory, np.s_[0 : len(bidding_memory) - max_memory], axis=0)
 
         # select train data and train model
-        train_data = memory[
-            np.random.choice(len(memory), rounds_per_step * 36 * training_size_multiplier, replace=False), :
-        ]
+        if(rounds_per_step * 36 * training_size_multiplier < len(memory)): 
+            train_data = memory[
+                np.random.choice(len(memory), rounds_per_step * 36 * training_size_multiplier, replace=False), :
+            ]
+        else:
+            train_data = memory[
+                np.random.choice(len(memory), len(memory), replace=False), :
+            ]
+
 
         # load train and save model
         model = tf.keras.models.load_model(f"{data_dir}/Data/Models/{model_path}")

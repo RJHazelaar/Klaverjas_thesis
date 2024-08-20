@@ -49,7 +49,7 @@ class Round:
                 
                 possible_trump_suit = options[np.argmax(trump_scores)]
                 # If player predicts a win by a slight margin
-                if trump_scores[np.argmax(trump_scores)] > 0:
+                if trump_scores[np.argmax(trump_scores)] > 0.1:
                     self.declarer = bidder
                     self.trump_suit = possible_trump_suit
                     break
