@@ -4,7 +4,7 @@ import math
 import time
 import sys
 
-from AlphaZero.train_alphazero_master import train
+from Tijduluk.train_bidden import train
 from AlphaZero.AlphaZeroPlayer.networks import create_simple_nn, create_normal_two_headed_nn, create_bidding_nn, create_bidding_nn_alt
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
@@ -150,14 +150,14 @@ def main():
     model_params = {
         "model_type": "two_headed",
         "learning_rate": 0.01,
-        "l1": 0.0001,
-        "l2": 0.0001,
+        "l1": 0.001,
+        "l2": 0.001,
     }
     bidding_model_params = {
         "model_type": "bidding_alt",
         "learning_rate": 0.01,
-        "l1": 0.0001,
-        "l2": 0.0001,
+        "l1": 0.001,
+        "l2": 0.001,
     }
     selfplay_params = {
         "rounds_per_step": 40,  # amount of selfplay rounds per step

@@ -6,8 +6,10 @@ import random
 import time
 import tensorflow as tf
 import wandb
+from tensorflow import keras
+from keras._tf_keras.keras.utils import to_categorical
 
-from keras.utils import to_categorical
+#from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from multiprocessing import get_context
 
@@ -170,15 +172,8 @@ def train_bidding_nn(train_data, model: tf.keras.Sequential, fit_params, callbac
         train_data[:, :36], train_data[:, 36], train_size=0.8, shuffle=True
     )
 
-    print(y_train)
-    print(y_test)
     y_train = to_categorical(y_train, 5)
     y_test = to_categorical(y_test, 5)
-
-
-    print("ayo mr white")
-    print(y_train)
-    print(y_test)
 
     model.fit(
         X_train,

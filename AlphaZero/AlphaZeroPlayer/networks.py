@@ -40,18 +40,18 @@ def create_normal_two_headed_nn(learning_rate, l1, l2):
 
     base_layers = tf.keras.models.Sequential(
         [
-            tf.keras.layers.Dense(1024, activation="relu"),
-            tf.keras.layers.Dense(512, activation="relu"),
-            tf.keras.layers.Dense(512, activation="relu"),
-            tf.keras.layers.Dense(512, activation="relu"),
+            tf.keras.layers.Dense(256, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
+            tf.keras.layers.Dense(256, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
+            tf.keras.layers.Dense(256, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
+            tf.keras.layers.Dense(128, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
         ],
         name="base_layers",
     )(input)
     
     value_head = tf.keras.models.Sequential(
         [
-            tf.keras.layers.Dense(512, activation="relu"),
-            tf.keras.layers.Dense(256, activation="relu"),
+            tf.keras.layers.Dense(128, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
+            tf.keras.layers.Dense(64, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
             tf.keras.layers.Dense(1, activation="linear"),
         ],
         name="value_head",
@@ -59,8 +59,8 @@ def create_normal_two_headed_nn(learning_rate, l1, l2):
 
     policy_head = tf.keras.models.Sequential(
         [
-            tf.keras.layers.Dense(512, activation="relu"),
-            tf.keras.layers.Dense(256, activation="relu"),
+            tf.keras.layers.Dense(128, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
+            tf.keras.layers.Dense(64, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
             tf.keras.layers.Dense(32, activation="softmax"),
         ],
         name="policy_head",
@@ -141,8 +141,8 @@ def create_bidding_nn(learning_rate, l1, l2):
 def create_bidding_nn_alt(learning_rate, l1, l2):
     model = tf.keras.models.Sequential(
         [
-            tf.keras.layers.Dense(800, activation="relu", kernel_regularizer=tf.keras.regularizers.l1_l2(l1, l2)),
-            tf.keras.layers.Dense(800, activation="relu", kernel_regularizer=tf.keras.regularizers.l1_l2(l1, l2)),
+            tf.keras.layers.Dense(256, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
+            tf.keras.layers.Dense(256, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(l2)),
             tf.keras.layers.Dense(1, activation="tanh"),
         ]
     )
