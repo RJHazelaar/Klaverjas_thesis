@@ -170,16 +170,6 @@ def train_bidding_nn(train_data, model: tf.keras.Sequential, fit_params, callbac
         train_data[:, :36], train_data[:, 36], train_size=0.8, shuffle=True
     )
 
-    print(y_train)
-    print(y_test)
-    y_train = to_categorical(y_train, 5)
-    y_test = to_categorical(y_test, 5)
-
-
-    print("ayo mr white")
-    print(y_train)
-    print(y_test)
-
     model.fit(
         X_train,
         y_train,
