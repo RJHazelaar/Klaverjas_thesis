@@ -73,6 +73,8 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
                 if current_player == 0:
                     played_card, policy = alpha_player_0.get_move(True, extra_noise_ratio)
                     X_train[round_num * 36 + trick * 4] = alpha_player_0.state.to_nparray_alt()
+                    print("train_alphazero_master.py policy player 0")
+                    print(policy)
                     y_train_policy[round_num * 36 + trick * 4] = policy 
                 elif current_player == 1:
                     played_card, policy = alpha_player_1.get_move(True, extra_noise_ratio)
