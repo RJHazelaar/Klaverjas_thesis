@@ -145,7 +145,7 @@ def main():
         "budget": 12,  # hours
         "multiprocessing": True, #TODO
         "n_cores": n_cores,
-        "jumpstart": 1,
+        "jumpstart": 0,
     }
     model_params = {
         "model_type": "two_headed",

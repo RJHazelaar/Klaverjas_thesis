@@ -335,9 +335,9 @@ def train(
             )
         total_testing_time += time.time() - tijd
 
-        nn_scaler_frequency = 60
+        nn_scaler_frequency = 180
         if step % nn_scaler_frequency == 0 and mcts_params["nn_scaler"] < 1:
-            mcts_params["nn_scaler"] += 0.2
+            mcts_params["nn_scaler"] = 1
     # always test at the end
     if step % test_frequency != 0:
         scores_round, _, _ = run_test_multiprocess(
