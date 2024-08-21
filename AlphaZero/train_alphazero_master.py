@@ -151,8 +151,8 @@ def train_nn(train_data, model: tf.keras.Sequential, fit_params, callbacks):
         train_data[:, :331], train_y, train_size=0.8, shuffle=True
     )
 
-    y_train_value, y_train_policy = y_train[:, 0], y_train[:, 1:32] 
-    y_test_value, y_test_policy = y_test[:, 0], y_test[:, 1:32]
+    y_train_value, y_train_policy = y_train[:, 0], y_train[:, 1:33] 
+    y_test_value, y_test_policy = y_test[:, 0], y_test[:, 1:33]
 
     print("X_train")
     print(X_train)
