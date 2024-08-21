@@ -135,7 +135,6 @@ def main():
         cluster = "local"
     print(f"Using {n_cores} cores on {cluster}")
 
-    n_cores = 1
     model_name = "value_network_policy"
     bidding_model_name = "bidding_network_policy"
     run_settings = {
@@ -144,7 +143,7 @@ def main():
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
         "budget": 12,  # hours
-        "multiprocessing": False, #TODO
+        "multiprocessing": True, #TODO
         "n_cores": n_cores,
         "jumpstart": 1,
     }
