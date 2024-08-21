@@ -73,27 +73,18 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
                 if current_player == 0:
                     played_card, policy = alpha_player_0.get_move(True, extra_noise_ratio)
                     X_train[round_num * 36 + trick * 4] = alpha_player_0.state.to_nparray_alt()
-                    print("train_alphazero_master.py policy player 0")
-                    print(policy)
                     y_train_policy[round_num * 36 + trick * 4] = policy
-                    print(y_train_policy[round_num * 36 + trick * 4]) 
                 elif current_player == 1:
                     played_card, policy = alpha_player_1.get_move(True, extra_noise_ratio)
                     X_train[round_num * 36 + trick * 4 + 1] = alpha_player_1.state.to_nparray_alt()
-                    print("train_alphazero_master.py policy player 1")
-                    print(policy)
                     y_train_policy[round_num * 36 + trick * 4 + 1] = policy 
                 elif current_player == 2:
                     played_card, policy = alpha_player_2.get_move(True, extra_noise_ratio)
                     X_train[round_num * 36 + trick * 4 + 2] = alpha_player_2.state.to_nparray_alt()
-                    print("train_alphazero_master.py policy player 2")
-                    print(policy)
                     y_train_policy[round_num * 36 + trick * 4 + 2] = policy 
                 else:
                     played_card, policy = alpha_player_3.get_move(True, extra_noise_ratio)
                     X_train[round_num * 36 + trick * 4 + 3] = alpha_player_3.state.to_nparray_alt()
-                    print("train_alphazero_master.py policy player 3")
-                    print(policy)
                     y_train_policy[round_num * 36 + trick * 4 + 3] = policy 
 
                 alpha_player_0.update_state(played_card)
@@ -160,8 +151,8 @@ def train_nn(train_data, model: tf.keras.Sequential, fit_params, callbacks):
         train_data[:, :331], train_y, train_size=0.8, shuffle=True
     )
 
-    y_train_value, y_train_policy = y_train[:, 0], y_train[:, 1] 
-    y_test_value, y_test_policy = y_test[:, 0], y_test[:, 1]
+    y_train_value, y_train_policy = y_train[:, 0], y_train[:, 1:32] 
+    y_test_value, y_test_policy = y_test[:, 0], y_test[:, 1:32]
 
     print("X_train")
     print(X_train)
