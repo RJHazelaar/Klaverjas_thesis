@@ -160,12 +160,13 @@ class MCTS:
         return move, policy
     
     def pimc_call(self, state, training, extra_noise_ratio):
+        all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
+
         legal_moves = state.legal_moves()
         print(legal_moves)
         if len(legal_moves) == 1:
             move = next(iter(legal_moves))
-            policy = [0] * 32
-            policy = [1 if x == move.id else 0 for x in policy]
+            policy = [1 if x == move.id else 0 for x in all_cards]
             return move, policy
         
         # for fixed order of moves
@@ -198,7 +199,6 @@ class MCTS:
             move = child
 
         # policy is over all 32 possible moves, need list of size 32 for (target) policy
-        all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
         dic = dict(zip(legal_moves_list_id, probabilities))
         print("dict")
         print(dic)
