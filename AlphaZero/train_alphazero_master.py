@@ -123,7 +123,10 @@ def selfplay(mcts_params, model_path, bidding_model_path, num_rounds, extra_nois
         # Did declaring team get more points than opponents
         team_declarer = int(round.declarer % 2)
         team_winner = int(score_player_1 > score_player_0)
-        y_train_bid[round_num] = int((team_declarer == team_winner))
+        if (team_declarer == team_winner):
+            y_train_bid[round_num] = 1
+        else:
+            y_train_bid[round_num] = -1
         #for bidder, player in zip(round.bidders, [0,1,2,3]):
         #    X_train_bid[round_num * 4 + player] = X_train_bid[round_num * 4 + player] * bidder
         #    y_train_bid[round_num * 4 + player] = alpha_player_0.state.get_prediction_score(0, round.declarer, round.trump_suit) * bidder
