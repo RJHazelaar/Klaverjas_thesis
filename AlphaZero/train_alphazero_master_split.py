@@ -29,7 +29,7 @@ def selfplay(mcts_params, model_value_path, model_policy_path, bidding_model_pat
         model_value = None
 
     if model_policy_path is not None:
-        model_policy = tf.keras.models.load_model(f"{data_dir}/Data/Models/{model_value_path}")
+        model_policy = tf.keras.models.load_model(f"{data_dir}/Data/Models/{model_policy_path}")
     else:
         model_policy = None
 
