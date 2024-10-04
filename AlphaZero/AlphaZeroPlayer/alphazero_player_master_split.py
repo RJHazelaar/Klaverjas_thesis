@@ -3,7 +3,7 @@ from __future__ import annotations  # To use the class name in the type hinting
 from Lennard.rounds import Round
 from AlphaZero.AlphaZeroPlayer.Klaverjas.card import Card
 from AlphaZero.AlphaZeroPlayer.Klaverjas.state import State
-from AlphaZero.AlphaZeroPlayer.mcts_master import MCTS
+from AlphaZero.AlphaZeroPlayer.mcts_master_split import MCTS
 
 
 class AlphaZero_player_master_split:
