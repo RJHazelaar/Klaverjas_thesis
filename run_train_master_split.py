@@ -23,7 +23,7 @@ def run_train(
     n_cores = run_settings["n_cores"]
     starting_step = run_settings["starting_step"]
     model_value_name = run_settings["model_value_name"]
-    model_policy_name = run_settings["model_value_name"]
+    model_policy_name = run_settings["model_policy_name"]
     bidding_model_name = run_settings["bidding_model_name"]
     multiprocessing = run_settings["multiprocessing"]
     learning_rate = model_params["learning_rate"]
