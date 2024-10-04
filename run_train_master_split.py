@@ -4,7 +4,7 @@ import math
 import time
 import sys
 
-from AlphaZero.train_alphazero_master import train
+from AlphaZero.train_alphazero_master_split import train
 from AlphaZero.AlphaZeroPlayer.networks import create_simple_nn, create_normal_two_headed_nn, create_bidding_nn, create_bidding_nn_alt, create_value_nn, create_policy_nn
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
