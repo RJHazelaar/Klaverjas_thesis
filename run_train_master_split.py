@@ -4,8 +4,8 @@ import math
 import time
 import sys
 
-from Tijduluk.train_bidden import train
-from AlphaZero.AlphaZeroPlayer.networks import create_simple_nn, create_normal_two_headed_nn, create_bidding_nn, create_bidding_nn_alt
+from AlphaZero.train_alphazero_master import train
+from AlphaZero.AlphaZeroPlayer.networks import create_simple_nn, create_normal_two_headed_nn, create_bidding_nn, create_bidding_nn_alt, create_value_nn, create_policy_nn
 
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
 data_dir = "/local/s1762508"
@@ -22,7 +22,8 @@ def run_train(
     budget = run_settings["budget"]
     n_cores = run_settings["n_cores"]
     starting_step = run_settings["starting_step"]
-    model_name = run_settings["model_name"]
+    model_value_name = run_settings["model_value_name"]
+    model_policy_name = run_settings["model_value_name"]
     bidding_model_name = run_settings["bidding_model_name"]
     multiprocessing = run_settings["multiprocessing"]
     learning_rate = model_params["learning_rate"]
@@ -47,7 +48,20 @@ def run_train(
     selfplay_params["rounds_per_step"] = rounds_per_step
     max_memory = rounds_per_step * 36 * max_memory_multiplier
 
-   
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project=run_settings["project_name"],
+        # name of the run
+        name=model_value_name,
+        # track hyperparameters and run metadata
+        config={
+            "run_settings": run_settings,
+            "model_params": model_params,
+            "selfplay_params": selfplay_params,
+            "fit_params": fit_params,
+            "test_params": test_params,
+        },
+    )
     print("starting training")
     print("run settings:", run_settings)
     print("model params:", model_params)
@@ -57,10 +71,10 @@ def run_train(
     print("test params:", test_params)
 
     if starting_step == 0:
-        print(f"{data_dir}/Klaverjas_thesis-main/Data/RL_data/{model_name}/")
+        print(f"{data_dir}/Klaverjas_thesis-main/Data/RL_data/{model_value_name}/")
         #print(f"{parent_dir}/Klaverjas_thesis-main/Data/RL_data/{model_name}/")
         try:
-            os.mkdir(f"{data_dir}/Klaverjas_thesis-main/Data/RL_data/{model_name}/")
+            os.mkdir(f"{data_dir}/Klaverjas_thesis-main/Data/RL_data/{model_value_name}/")
             #os.mkdir(f"{parent_dir}/Klaverjas_thesis-main/Data/RL_data/{model_name}/")
         except:
             print("\n\n\n============model already exists============\n\n\n")
@@ -68,10 +82,14 @@ def run_train(
             model = create_simple_nn(learning_rate, l1, l2)
         elif model_params["model_type"] == "two_headed":
             model = create_normal_two_headed_nn(learning_rate, l1, l2)
+        elif model_params["model_type"] == "split":
+            model_value = create_value_nn(learning_rate, l1, l2)
+            model_policy = create_policy_nn(learning_rate, l1, l2)
         else:
             raise Exception("model type not recognized")
 
-        model.save(f"{data_dir}/Klaverjas_thesis-main/Data/Models/{model_name}/{model_name}_0.h5")
+        model_value.save(f"{data_dir}/Klaverjas_thesis-main/Data/Models/{model_value_name}/{model_value_name}_0.h5")
+        model_policy.save(f"{data_dir}/Klaverjas_thesis-main/Data/Models/{model_value_name}/{model_policy_name}_0.h5")
         #model.save(f"{parent_dir}/Klaverjas_thesis-main/Data/Models/{model_name}/{model_name}_0.h5")
 #######################################################################################################
         print(f"{data_dir}/Klaverjas_thesis-main/Data/RL_data/{bidding_model_name}/")
@@ -93,7 +111,8 @@ def run_train(
     total_time, selfplay_time, training_time, testing_time = train(
         budget,
         starting_step,
-        model_name,
+        model_value_name,
+        model_policy_name,
         bidding_model_name,
         max_memory,
         multiprocessing,
@@ -122,11 +141,13 @@ def main():
         cluster = "local"
     print(f"Using {n_cores} cores on {cluster}")
 
-    model_name = "value_network_policy"
+    model_value_name = "value_network"
+    model_policy_name = "policy_network"
     bidding_model_name = "bidding_network_policy"
     run_settings = {
         "project_name": "Thesis_test_policy",
-        "model_name": model_name,
+        "model_value_name": model_value_name,
+        "model_policy_name": model_policy_name,
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
         "budget": 12,  # hours
@@ -135,16 +156,16 @@ def main():
         "jumpstart": 0,
     }
     model_params = {
-        "model_type": "two_headed",
+        "model_type": "split",
         "learning_rate": 0.01,
-        "l1": 0.001,
-        "l2": 0.001,
+        "l1": 0.0001,
+        "l2": 0.0001,
     }
     bidding_model_params = {
         "model_type": "bidding_alt",
         "learning_rate": 0.01,
-        "l1": 0.001,
-        "l2": 0.001,
+        "l1": 0.0001,
+        "l2": 0.0001,
     }
     selfplay_params = {
         "rounds_per_step": 40,  # amount of selfplay rounds per step
