@@ -376,6 +376,7 @@ class MCTS:
                     self.tijden2[1] += time.time() - now2
                     now2 = time.time()
                     nn_score = self.model_value(arr)
+                    print(nn_score, "NN_score")
                     if (current_state.current_player % 2 != root_team):
                         nn_score = int(-nn_score)
                     else:
