@@ -329,11 +329,11 @@ class MCTS:
         print(state.get_determinization)
 
         for simulation in range(steps):
-            print("FAKE:", state.get_determinization)
+            print("FAKE:", state.get_determinization())
             current_state.reset_determinization(determinized_hands)
             current_state.reset_information_set(root_info_suits, root_highest_trumps)
 
-            print("REAL:", state.get_determinization)
+            print("REAL:", state.get_determinization())
             now = time.time()
             # Determination
 
