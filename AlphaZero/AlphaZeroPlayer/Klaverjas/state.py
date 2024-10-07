@@ -109,7 +109,7 @@ class State:
             self.hands[player] = hands[index]
 
     def reset_determinization(self, hands):
-        all_hands = [set() for _ in range(4)]
+        all_hands = ([],[],[],[])
         for player, hand in enumerate(hands):
             for card in hand:
                 all_hands[player].append(card)
