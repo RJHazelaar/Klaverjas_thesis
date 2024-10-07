@@ -108,6 +108,17 @@ class State:
         for index, player in enumerate(other_players):
             self.hands[player] = hands[index]
 
+    def reset_determinization(self, hands):
+        all_hands = [set() for _ in range(4)]
+        for player, hand in enumerate(hands):
+            for card in hand:
+                all_hands[player].append(card)
+            self.hands[player] = all_hands[player]
+        return
+
+    def get_determinization(self):
+        return self.hands
+
     def find_determinization(
         self,
         all_cards: list[tuple],
