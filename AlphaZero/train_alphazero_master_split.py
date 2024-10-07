@@ -340,6 +340,8 @@ def train(
         model_value.save(f"{data_dir}/Data/Models/{model_value_path}")
         model_policy.save(f"{data_dir}/Data/Models/{model_policy_path}")
         #model.save(f"{parent_dir}/Data/Models/{model_path}")
+        if step == 60:
+            max_memory += 2
 
         # Same but for bidding network
 

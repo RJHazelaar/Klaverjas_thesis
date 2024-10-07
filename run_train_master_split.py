@@ -169,7 +169,7 @@ def main():
     }
     selfplay_params = {
         "rounds_per_step": 40,  # amount of selfplay rounds per step
-        "max_memory_multiplier": 10,  # memory size = rounds_per_step * 36 * max_memory_multiplier
+        "max_memory_multiplier": 1,  # memory size = rounds_per_step * 36 * max_memory_multiplier
         "extra_noise_ratio": 0.1,  # when training extra_noise_ratio * mcts_steps is added to all visit counts
         "mcts_params": {
             "mcts_steps": 200,

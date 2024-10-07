@@ -57,8 +57,6 @@ class MCTS_Node:
         return (2 * (score - self.q_min)) / (self.q_max - self.q_min) - 1
 
     def select_child_puct(self, c, simulation, root_team, state, model_policy):
-        #TODO unhardcode this
-        c_2 = 19652
         ucbs = []
         return_nodes = []
         legal_moves = list(self.legal_moves)
@@ -117,14 +115,14 @@ class MCTS_Node:
         for move in moves:
             if move not in children_moves: #Node not added to tree
                 return_nodes.append(self)
-                ucbs.append(c * (child_prob[move]))
+                ucbs.append((child_prob[move]) * (np.sqrt(self.visits) / (1 + 0)) * c)  # Gaat dit goed?
             else:
                 child = children_dict[move]
                 return_nodes.append(child)
                 if self.team == root_team:
-                    ucbs.append(self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * (c + np.log((self.visits + c_2 + 1)/(c_2))))
+                    ucbs.append(self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * c)
                 else:
-                    ucbs.append(-self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * (c + np.log((self.visits + c_2 + 1)/(c_2))))
+                    ucbs.append(-self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * c)
         index_max = np.argmax(np.array([ucbs]))
         return legal_moves[index_max], return_nodes[index_max] #new_node_move, new_node_node
 
