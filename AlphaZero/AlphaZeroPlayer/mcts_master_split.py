@@ -326,13 +326,9 @@ class MCTS:
         current_node = MCTS_Node(team = root_team)
         current_state.set_determinization()
 
-        print("JEZUS: ", print(current_state.get_determinization()))
         determinized_hands = copy.deepcopy(current_state.get_determinization())
-        print(current_state.get_determinization())
 
         for simulation in range(steps):
-            print("FAKE:", current_state.get_determinization())
-            current_state.reset_determinization(determinized_hands)
             current_state.reset_information_set(root_info_suits, root_highest_trumps)
 
             print("REAL:", current_state.get_determinization())
