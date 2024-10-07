@@ -325,6 +325,8 @@ class MCTS:
         root_highest_trumps = copy.deepcopy(state.highest_trumps)
         current_node = MCTS_Node(team = root_team)
         current_state.set_determinization()
+
+        print("JEZUS: ", print(current_state.get_determinization()))
         determinized_hands = copy.deepcopy(current_state.get_determinization())
         print(state.get_determinization())
 
