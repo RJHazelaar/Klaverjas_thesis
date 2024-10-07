@@ -328,14 +328,14 @@ class MCTS:
 
         print("JEZUS: ", print(current_state.get_determinization()))
         determinized_hands = copy.deepcopy(current_state.get_determinization())
-        print(state.get_determinization())
+        print(current_state.get_determinization())
 
         for simulation in range(steps):
-            print("FAKE:", state.get_determinization())
+            print("FAKE:", current_state.get_determinization())
             current_state.reset_determinization(determinized_hands)
             current_state.reset_information_set(root_info_suits, root_highest_trumps)
 
-            print("REAL:", state.get_determinization())
+            print("REAL:", current_state.get_determinization())
             now = time.time()
             # Determination
 
