@@ -331,7 +331,6 @@ class MCTS:
         for simulation in range(steps):
             current_state.reset_information_set(root_info_suits, root_highest_trumps)
 
-            print("REAL:", current_state.get_determinization())
             now = time.time()
             # Determination
 

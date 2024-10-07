@@ -108,8 +108,6 @@ class State:
         for index, player in enumerate(other_players):
             self.hands[player] = hands[index]
 
-        print("Determinization: ", self.hands)
-
     def reset_determinization(self, hands):
         all_hands = [set() for _ in range(4)]
         for player, hand in enumerate(hands):
