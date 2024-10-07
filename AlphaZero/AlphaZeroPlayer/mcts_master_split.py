@@ -177,6 +177,7 @@ class MCTS:
         for determinization in range(self.mcts_steps // self.steps_per_determinization):
             move, policy_dict = self.mcts_n_simulations(state, training, extra_noise_ratio, self.steps_per_determinization)
             # Moves might not always be in the same order
+            # We can use Card objects in dict because it has a hash method
             policy = [policy_dict[x] for x in legal_moves_list]            
             combined_policy += np.array(policy)
         
@@ -323,12 +324,19 @@ class MCTS:
         root_info_suits = copy.deepcopy(state.can_follow_suit)
         root_highest_trumps = copy.deepcopy(state.highest_trumps)
         current_node = MCTS_Node(team = root_team)
+        current_state.set_determinization()
+        determinized_hands = copy.deepcopy(current_state.get_determinization())
+        print(state.get_determinization)
 
         for simulation in range(steps):
+            print("FAKE:", state.get_determinization)
+            current_state.reset_determinization(determinized_hands)
             current_state.reset_information_set(root_info_suits, root_highest_trumps)
+
+            print("REAL:", state.get_determinization)
             now = time.time()
             # Determination
-            current_state.set_determinization()
+
             self.tijden[0] += time.time() - now
             now = time.time()
             # Selection

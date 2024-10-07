@@ -16,7 +16,7 @@ class Round:
         self.bidders = [0,0,0,0] # Player that did a bid
         self.passes = 0
         if alternate_model:
-            options = ["k","h","r","s","p"]
+            options = ["k","h","r","s"]
             self.trump_suit = "k"
             declarer = starting_player
             self.tricks = [Trick(starting_player)]
@@ -37,6 +37,10 @@ class Round:
             # NEURAL NETWORK
             # TODO Vectorize to output all players simultaneously
             bidding_order = list(range(declarer, 4)) + list(range(0, declarer))
+            # list of highest scores that were output from the bidding network for each player
+            highest_scores = []
+            # the trump suits that match these highest scores
+            trumps_hs = []
             for bidder in bidding_order:
                 trump_scores = []
                 possible_trump_suit = "k"
@@ -49,24 +53,45 @@ class Round:
                 
                 possible_trump_suit = options[np.argmax(trump_scores)]
                 # If player predicts a win by a slight margin
-                if trump_scores[np.argmax(trump_scores)] > 0.1:
-                    self.declarer = bidder
-                    self.trump_suit = possible_trump_suit
-                    break
-                else:
-                    self.passes += 1
-
-
-            if self.passes == 4: # First declarer forced to make a decision, can't pass
-                bidder = starting_player
-                trump_scores = []
-                for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
-                    input_vector = self.hand_to_input_vector_alt(trump, bidder, starting_player)
-                    output = alternate_model(input_vector)
-                    self.bidders[bidder] = 1
-                    trump_scores.append(output)
+                # TODO Make it so that the bidder has the win probability
+                highest_scores.append(max(trump_scores))
+                trumps_hs.append(options[np.argmax(trump_scores)])
                 
-                self.trump_suit = options[np.argmax(trump_scores)] #TODO Just use the previous output
+            self.trump_suit = trumps_hs[np.argmax(highest_scores)]
+            self.declarer = bidding_order[np.argmax(highest_scores)]
+
+            # old backup code
+            #for bidder in bidding_order:
+            #    trump_scores = []
+            #    possible_trump_suit = "k"
+            #    self.bidders[bidder] = 1
+            #    for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
+            #        input_vector = self.hand_to_input_vector_alt(trump, bidder, starting_player)
+            #        output = alternate_model(input_vector)
+
+            #        trump_scores.append(output)
+                
+            #    possible_trump_suit = options[np.argmax(trump_scores)]
+            #    # If player predicts a win by a slight margin
+            #    # TODO Make it so that the bidder has the win probability
+            #    if trump_scores[np.argmax(trump_scores)] > 0.1:
+            #        self.declarer = bidder
+            #        self.trump_suit = possible_trump_suit
+            #        break
+            #    else:
+            #        self.passes += 1
+
+
+            #if self.passes == 4: # First declarer forced to make a decision, can't pass
+            #    bidder = starting_player
+            #    trump_scores = []
+            #    for index, trump in enumerate(["k","h","r","s"]): #starting_player==declarer in first bid
+            #        input_vector = self.hand_to_input_vector_alt(trump, bidder, starting_player)
+            #        output = alternate_model(input_vector)
+            #        self.bidders[bidder] = 1
+            #        trump_scores.append(output)
+                
+            #    self.trump_suit = options[np.argmax(trump_scores)] #TODO Just use the previous output
                 # original declarer == 5th declarer == starting_player
             # NEURAL NETWORK
 
