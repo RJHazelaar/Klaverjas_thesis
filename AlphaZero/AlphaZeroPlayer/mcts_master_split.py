@@ -326,7 +326,7 @@ class MCTS:
         current_node = MCTS_Node(team = root_team)
         current_state.set_determinization()
         determinized_hands = copy.deepcopy(current_state.get_determinization())
-        print(state.get_determinization)
+        print(state.get_determinization())
 
         for simulation in range(steps):
             print("FAKE:", state.get_determinization())
