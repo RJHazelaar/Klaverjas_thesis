@@ -328,19 +328,21 @@ def train(
         training_time = time.time() - tijd
         model_value_path = f"{model_value_name}/{model_value_name}_{step}.h5"
         model_policy_path = f"{model_value_name}/{model_policy_name}_{step}.h5"
-        if step == 300:
+        if step == 120:
             tf.keras.backend.set_value(
                 model_value.optimizer.learning_rate,
-                tf.keras.backend.get_value(model_value.optimizer.learning_rate) / 10,
+                tf.keras.backend.get_value(model_value.optimizer.learning_rate) / 2,
             )
             tf.keras.backend.set_value(
                 model_policy.optimizer.learning_rate,
-                tf.keras.backend.get_value(model_value.optimizer.learning_rate) / 10,
+                tf.keras.backend.get_value(model_value.optimizer.learning_rate) / 2,
             )
         model_value.save(f"{data_dir}/Data/Models/{model_value_path}")
         model_policy.save(f"{data_dir}/Data/Models/{model_policy_path}")
         #model.save(f"{parent_dir}/Data/Models/{model_path}")
-        if step == 60:
+        if step == 120:
+            max_memory += 2
+        if step == 240:
             max_memory += 2
 
         # Same but for bidding network
@@ -361,7 +363,7 @@ def train(
         train_bidding_nn(bidding_train_data, bidding_model, fit_params, [early_stopping])
         training_time = time.time() - tijd
         bidding_model_path = f"{bidding_model_name}/{bidding_model_name}_{step}.h5"
-        if step == 300:
+        if step == 120:
             tf.keras.backend.set_value(
                 bidding_model.optimizer.learning_rate,
                 tf.keras.backend.get_value(bidding_model.optimizer.learning_rate) / 10,
@@ -385,7 +387,7 @@ def train(
             )
         total_testing_time += time.time() - tijd
 
-        nn_scaler_frequency = 180
+        nn_scaler_frequency = 60
         if step % nn_scaler_frequency == 0 and mcts_params["nn_scaler"] < 1:
             mcts_params["nn_scaler"] = 1
     # always test at the end
