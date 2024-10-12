@@ -387,7 +387,7 @@ def train(
             )
         total_testing_time += time.time() - tijd
 
-        nn_scaler_frequency = 60
+        nn_scaler_frequency = 6000
         if step % nn_scaler_frequency == 0 and mcts_params["nn_scaler"] < 1:
             mcts_params["nn_scaler"] = 1
     # always test at the end
