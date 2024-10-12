@@ -328,7 +328,7 @@ def train(
         training_time = time.time() - tijd
         model_value_path = f"{model_value_name}/{model_value_name}_{step}.h5"
         model_policy_path = f"{model_value_name}/{model_policy_name}_{step}.h5"
-        if step == 120:
+        if step == 160:
             tf.keras.backend.set_value(
                 model_value.optimizer.learning_rate,
                 tf.keras.backend.get_value(model_value.optimizer.learning_rate) / 2,

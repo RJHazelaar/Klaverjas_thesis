@@ -157,7 +157,7 @@ def main():
     }
     model_params = {
         "model_type": "split",
-        "learning_rate": 0.02,
+        "learning_rate": 0.01,
         "l1": 0.0001,
         "l2": 0.0001,
     }
@@ -190,7 +190,7 @@ def main():
         "mcts_params": {
             "mcts_steps": 10,
             "n_of_sims": 0,
-            "nn_scaler": 1,
+            "nn_scaler": 0, #TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO#TODO
             "ucb_c": 1.4,
             "steps_per_determinization": 10,
         },

@@ -367,7 +367,7 @@ class MCTS:
             if not current_state.round_complete():
                 sim_score = 0
 
-                if self.model_value is not None:
+                if self.model_value is not None and self.nn_scaler > 0:
                     now2 = time.time()
                     if(current_state.current_player == root_player):
                         stat = current_state.to_nparray_alt()
