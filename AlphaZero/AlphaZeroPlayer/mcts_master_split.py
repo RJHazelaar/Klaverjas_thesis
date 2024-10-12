@@ -384,6 +384,8 @@ class MCTS:
                     else:
                         nn_score = int(nn_score)
                     self.tijden2[2] += time.time() - now2
+                else:
+                    nn_score = 0
 
                 if self.nn_scaler < 1: 
                     for _ in range(self.n_of_sims):
