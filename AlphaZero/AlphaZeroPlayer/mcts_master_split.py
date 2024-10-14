@@ -95,17 +95,17 @@ class MCTS_Node:
         if prob_distr_legal == zeroes:
             probabilities_legal = zeroes
         else:
-            probabilities_legal = prob_distr_legal / np.linalg.norm(prob_distr_legal)
+            probabilities_legal = prob_distr_legal / np.sum(prob_distr_legal)
 
         print("Prob_distr_legal: ", probabilities_legal)
 
         # Add Dirichlet noise for added exploration from root during training
+        # TODO NOT ACTUAL DIRICHLET NOISE RIGHT NOW
+        dirichlet_epsilon = 0.25
         if self.root:
-            dirichlet_alpha = 0.03
-            dirichlet_epsilon = 0.25
-            dirichlet_noise = [dirichlet_alpha] * len(probabilities_legal)
-            for index, prob in enumerate(probabilities_legal):
-                probabilities_legal[index] = (1-dirichlet_epsilon)*prob + dirichlet_epsilon * dirichlet_noise[index]
+            probabilities_legal = [i + dirichlet_epsilon for i in probabilities_legal]
+            probabilities_legal = probabilities_legal / np.sum(probabilities_legal)
+
 
         child_prob = dict(zip(moves, probabilities_legal))
 
