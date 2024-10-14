@@ -115,7 +115,7 @@ class MCTS_Node:
         for move in moves:
             if move not in children_moves: #Node not added to tree
                 return_nodes.append(self)
-                ucbs.append((child_prob[move]) * (np.sqrt(self.visits) / (1 + 0)) * c)  # Gaat dit goed?
+                ucbs.append((child_prob[move]) * (np.sqrt(self.visits) / (1 + 0)) * 10)  # Gaat dit goed? #TODO hardcoded value
             else:
                 child = children_dict[move]
                 return_nodes.append(child)
