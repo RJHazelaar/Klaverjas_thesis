@@ -151,7 +151,7 @@ def main():
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
         "budget": 12,  # hours
-        "multiprocessing": False, #TODO
+        "multiprocessing": True, #TODO
         "n_cores": n_cores,
         "jumpstart": 0,
     }
@@ -175,7 +175,7 @@ def main():
             "mcts_steps": 200,
             "n_of_sims": 1,
             "nn_scaler": 0,
-            "ucb_c": 1.6,
+            "ucb_c": 1.4,
             "steps_per_determinization": 40,
         },
     }

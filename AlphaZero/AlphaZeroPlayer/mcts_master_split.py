@@ -97,8 +97,6 @@ class MCTS_Node:
         else:
             probabilities_legal = prob_distr_legal / np.sum(prob_distr_legal)
 
-        print("Prob_distr_legal: ", probabilities_legal)
-
         # Add Dirichlet noise for added exploration from root during training
         # TODO NOT ACTUAL DIRICHLET NOISE RIGHT NOW
         dirichlet_epsilon = 0.25
