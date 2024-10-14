@@ -82,6 +82,8 @@ class MCTS_Node:
         prob_distr = model_policy(np.array([stat])) #32 size array
         prob_distr = prob_distr.numpy().ravel().tolist()
 
+        print("Prob_distr: ", prob_distr)
+
         moves = [a.id for a in legal_moves]
         all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
 
@@ -94,6 +96,8 @@ class MCTS_Node:
             probabilities_legal = zeroes
         else:
             probabilities_legal = prob_distr_legal / np.linalg.norm(prob_distr_legal)
+
+        print("Prob_distr_legal: ", probabilities_legal)
 
         # Add Dirichlet noise for added exploration from root during training
         if self.root:
@@ -124,6 +128,8 @@ class MCTS_Node:
                 else:
                     ucbs.append(-self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * c)
         index_max = np.argmax(np.array([ucbs]))
+
+        print("ucbs: ", ucbs)
         return legal_moves[index_max], return_nodes[index_max] #new_node_move, new_node_node
 
 
