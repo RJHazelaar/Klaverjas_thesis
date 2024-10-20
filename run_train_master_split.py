@@ -151,7 +151,7 @@ def main():
         "bidding_model_name": bidding_model_name,
         "starting_step": 0,
         "budget": 12,  # hours
-        "multiprocessing": False, #TODO
+        "multiprocessing": True, #TODO
         "n_cores": n_cores,
         "jumpstart": 0,
     }
