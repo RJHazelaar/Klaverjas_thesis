@@ -84,10 +84,14 @@ class MCTS_Node:
 
         moves = [a.id for a in legal_moves]
         all_cards = [0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35,36,37]
-
+        print("moves: ", moves)
+        print("all_cards: ", all_cards)
+        print("prob_distr: ", prob_distr)
         dic = dict(zip(all_cards, prob_distr))
         # Remove probabilities of illegal moves
         prob_distr_legal = [0 if x not in dic else dic[x] for x in moves]
+
+        print("prob_distr_legal: ", prob_distr_legal)
         zeroes = [0] * len(prob_distr_legal)
         # Renormalize probabilities
         if prob_distr_legal == zeroes:
@@ -95,6 +99,7 @@ class MCTS_Node:
         else:
             probabilities_legal = prob_distr_legal / np.sum(prob_distr_legal)
 
+        print("probabilities_legal: ", probabilities_legal)
         # Add Dirichlet noise for added exploration from root during training
         # TODO NOT ACTUAL DIRICHLET NOISE RIGHT NOW
         dirichlet_epsilon = 0.25
@@ -103,7 +108,7 @@ class MCTS_Node:
             probabilities_legal = probabilities_legal / np.sum(probabilities_legal)
 
 
-        child_prob = dict(zip(moves, probabilities_legal))
+        child_prob = dict(zip(moves, probabilities_legal)) #GAAT DEZE WEL GOOOOEEEED?
 
         children_moves = []
         children_nodes = []
@@ -119,7 +124,7 @@ class MCTS_Node:
             else:
                 child = children_dict[move]
                 return_nodes.append(child)
-                if self.team == root_team:
+                if self.team == root_team: #TODOTODO TODO TODO TODO GAAT HET GOED MET +/- SCORES
                     ucbs.append(self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * c)
                 else:
                     ucbs.append(-self.normalized_score(child.score / child.visits) + (child_prob[move]) * (np.sqrt(self.visits) / (1 + child.visits)) * c)
