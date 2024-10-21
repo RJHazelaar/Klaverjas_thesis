@@ -229,12 +229,13 @@ class MCTS:
         current_state = copy.deepcopy(state)
         root_team = current_state.current_player % 2
         current_node = MCTS_Node(team = root_team)
+        current_state.set_determinization()
 
         for simulation in range(steps):
 
             now = time.time()
             # Determination
-            current_state.set_determinization()
+
             self.tijden[0] += time.time() - now
             now = time.time()
             # Selection
