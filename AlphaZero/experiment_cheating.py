@@ -6,7 +6,7 @@ import tensorflow as tf
 import pandas as pd
 import sys
 
-from multiprocessing import Pool, get_context
+from multiprocessing import Pool, get_context,  Process, Manager
 from typing import List
 
 from AlphaZero.AlphaZeroPlayer.Klaverjas.card import Card
@@ -23,16 +23,20 @@ parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../")))
 sys.path.append(parent_dir)
 data_dir = parent_dir+"/Data/SL_Data/originalDB.csv"
 
-def test_vs_alphazero_player(
+def test_vs_alphazero_player( # Incomplete, does not cheat
     num_rounds: int,
     process_id: int,
     mcts_params: dict,
     model_paths: List[str],
+    list_scores: List[int],
 ):
-    mcts_times = [0, 0, 0, 0, 0]
     alpha_eval_time = 0
+    mcts_times = [0, 0, 0, 0, 0]
     point_cumulative = [0, 0]
+    wins_cumulative = [0, 0]
     scores_alpha = []
+    scores_round = []
+    list_scores_local = []
 
     if num_rounds * (process_id + 1) > 50010:
         raise "too many rounds"
@@ -54,11 +58,19 @@ def test_vs_alphazero_player(
         # if not process_id and round_num % 50 == 0:
         #     print(round_num)
         # round = Round((starting_player + 1) % 4, random.choice(['k', 'h', 'r', 's']), random.choice([0,1,2,3]))
-
-        round = Round(
-            rounds.loc[round_num]["FirstPlayer"], rounds.loc[round_num]["Troef"][0], rounds.loc[round_num]["Gaat"]
-        )
-        round.set_cards(rounds.loc[round_num]["Cards"])
+        if round_num % 2 ==0:
+            round = Round(
+                rounds.loc[round_num]["FirstPlayer"], rounds.loc[round_num]["Troef"][0], rounds.loc[round_num]["Gaat"]
+            )
+            round.set_cards(rounds.loc[round_num]["Cards"])
+        else:
+            round = Round(
+                (rounds.loc[round_num - 1]["FirstPlayer"] + 1) % 4,
+                rounds.loc[round_num - 1]["Troef"][0],
+                (rounds.loc[round_num - 1]["Gaat"] + 1) % 4,
+            )
+            cards = rounds.loc[round_num - 1]["Cards"]
+            round.set_cards(cards[3:] + cards[:3])
 
         alpha_player_0.new_round_Round(round)
         alpha_player_1.new_round_Round(round)
@@ -80,7 +92,20 @@ def test_vs_alphazero_player(
                 else:
                     played_card = alpha_player_3.get_move()
                 alpha_eval_time += time.time() - tijd
+                played_card = card_untransform(played_card.id, ["k", "h", "r", "s"].index(round.trump_suit))
+                moves = round.legal_moves()
 
+                found = False
+                for move in moves:
+                    if move.id == played_card:
+                        played_card = move
+                        found = True
+                        break
+                if not found:
+                    raise Exception("Move not found")
+                
+                round.play_card(played_card)
+                move = Card(card_transform(played_card.id, ["k", "h", "r", "s"].index(round.trump_suit)))
                 alpha_player_0.update_state(played_card)
                 alpha_player_1.update_state(played_card)
                 alpha_player_2.update_state(played_card)
@@ -90,24 +115,38 @@ def test_vs_alphazero_player(
             mcts_times[i] += alpha_player_0.tijden[i]
 
         scores_alpha.append(alpha_player_0.state.get_score(0))
+        scores_round.append(round.get_score(0))
+        if scores_alpha[-1] != scores_round[-1]:
+            print("scores_alpha not always equal to scores_round")
+            print(scores_alpha[-1], scores_round[-1])
 
         point_cumulative[0] += round.points[0] + round.meld[0]
         point_cumulative[1] += round.points[1] + round.meld[1]
 
-    return scores_alpha, point_cumulative, mcts_times, alpha_eval_time / 4
+        if round.points[0] > round.points[1]:
+            wins_cumulative[0] += 1
+        else:
+            wins_cumulative[1] += 1
+        
+        list_scores_local.append(round.points[0]+round.meld[0]-round.points[1]-round.meld[1])
+    list_scores.extend(list_scores_local)
+    return scores_alpha, point_cumulative, mcts_times, alpha_eval_time / 4, wins_cumulative
 
 def test_vs_rule_player_heavy(
     num_rounds: int,
     process_id: int,
     mcts_params: dict,
     model_paths: List[str],
+    list_scores: List[int],
 ):
     # random.seed(13)
     alpha_eval_time = 0
     mcts_times = [0, 0, 0, 0, 0]
     point_cumulative = [0, 0]
+    wins_cumulative = [0, 0]
     scores_alpha = []
     scores_round = []
+    list_scores_local = []
 
     if num_rounds * (process_id + 1) > 50010:
         raise "too many rounds"
@@ -198,20 +237,30 @@ def test_vs_rule_player_heavy(
         point_cumulative[0] += round.points[0] + round.meld[0]
         point_cumulative[1] += round.points[1] + round.meld[1]
 
-    return scores_round, point_cumulative, mcts_times, alpha_eval_time / 2
+        if round.points[0] > round.points[1]:
+            wins_cumulative[0] += 1
+        else:
+            wins_cumulative[1] += 1
+        
+        list_scores_local.append(round.points[0]+round.meld[0]-round.points[1]-round.meld[1])
+    list_scores.extend(list_scores_local)
+    return scores_round, point_cumulative, mcts_times, alpha_eval_time / 2, wins_cumulative
 
 def test_vs_rule_player(
     num_rounds: int,
     process_id: int,
     mcts_params: dict,
     model_paths: List[str],
+    list_scores: List[int],
 ):
     # random.seed(13)
     alpha_eval_time = 0
     mcts_times = [0, 0, 0, 0, 0]
     point_cumulative = [0, 0]
+    wins_cumulative = [0, 0]
     scores_alpha = []
     scores_round = []
+    list_scores_local = []
 
     if num_rounds * (process_id + 1) > 50010:
         raise "too many rounds"
@@ -302,11 +351,19 @@ def test_vs_rule_player(
         point_cumulative[0] += round.points[0] + round.meld[0]
         point_cumulative[1] += round.points[1] + round.meld[1]
 
+        if round.points[0] > round.points[1]:
+            wins_cumulative[0] += 1
+        else:
+            wins_cumulative[1] += 1
+
+        list_scores_local.append(round.points[0]+round.meld[0]-round.points[1]-round.meld[1])
+    list_scores.extend(list_scores_local)
     return scores_round, point_cumulative, mcts_times, alpha_eval_time / 2
 
 def run_test_multiprocess(
     n_cores: int, opponent: str, total_rounds: int, mcts_params: dict, model_paths: List[str], multiprocessing: bool
 ):
+    manager = Manager()
 
     rounds_per_process = total_rounds // n_cores
     if rounds_per_process == 0:
@@ -322,28 +379,34 @@ def run_test_multiprocess(
 
     scores_round = []
     points_cumulative = [0, 0]
+    wins_cumulative = [0, 0]
     mcts_times = [0, 0, 0, 0, 0]
     alpha_eval_time = 0
+    list_scores = manager.list()
+
+
     if multiprocessing:
         with get_context("spawn").Pool(processes=n_cores) as pool:
-            items = [(rounds_per_process, i, mcts_params, model_paths) for i in range(n_cores)]
+            items = [(rounds_per_process, i, mcts_params, model_paths, list_scores) for i in range(n_cores)]
             for result in pool.starmap(test_function, items):
                 scores_round += result[0]
                 points_cumulative[0] += result[1][0]
                 points_cumulative[1] += result[1][1]
                 mcts_times = [mcts_times[i] + result[2][i] for i in range(len(mcts_times))]
                 alpha_eval_time += result[3]
+                wins_cumulative[0] += result[4][0]
+                wins_cumulative[1] += result[4][1]
 
         if len(scores_round) != n_cores * rounds_per_process:
             print(len(scores_round))
             print(scores_round)
             raise Exception("wrong length")
     else:
-        scores_round, points_cumulative, mcts_times, alpha_eval_time = test_function(
+        scores_round, points_cumulative, mcts_times, alpha_eval_time, wins_cumulative = test_function(
             rounds_per_process, 0, mcts_params, model_paths
         )
 
     alpha_eval_time /= total_rounds * 8
     alpha_eval_time = round(alpha_eval_time * 1000, 1)  # convert to ms and round to 1 decimal
     temp = None
-    return scores_round, alpha_eval_time, temp
+    return scores_round, alpha_eval_time, temp, wins_cumulative, list_scores

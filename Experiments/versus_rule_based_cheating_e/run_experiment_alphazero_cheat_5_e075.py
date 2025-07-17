@@ -4,6 +4,7 @@ import os
 import math
 import sys
 
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../..")))
 sys.path.append(parent_dir)
 from AlphaZero.experiment_cheating import run_test_multiprocess
@@ -26,17 +27,17 @@ def run_test():
     opponent = "rule"
     multiprocessing = True
 
-    num_rounds = 5000 #TODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODO
+    num_rounds = 1000
     num_rounds = (
         math.ceil(num_rounds / n_cores) * n_cores
     )  # make sure rounds is divisible by n_cores and not devide to 0
 
     mcts_params = {
-        "mcts_steps": 200,
+        "mcts_steps": 3200,
         "n_of_sims": 1,
         "nn_scaler": 0,
         "ucb_c": 200,
-        "e_cheat": 1,
+        "e_cheat": 0.75,
     }
 
     # model_paths = ["SL_models/SL_model_0.h5", None]
@@ -55,7 +56,7 @@ def run_test():
         model_paths,
     )
     now = time.time()
-    scores_round, alpha_eval_time, _ = run_test_multiprocess(
+    scores_round, alpha_eval_time, _, wins_cumulative, list_scores = run_test_multiprocess(
         n_cores, opponent, num_rounds, mcts_params, model_paths, multiprocessing
     )
     print("results exp1", mcts_params)
@@ -69,7 +70,10 @@ def run_test():
         round(np.std(scores_round) / np.sqrt(len(scores_round)), 1),
         "eval_time(ms):",
         alpha_eval_time,
+        "wins_cumulative",
+        wins_cumulative,
     )
+    print("list of scores", list_scores)
 
 
 if __name__ == "__main__":

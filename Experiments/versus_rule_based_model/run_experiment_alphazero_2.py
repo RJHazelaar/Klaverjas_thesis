@@ -4,6 +4,7 @@ import os
 import math
 import sys
 
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../..")))
 sys.path.append(parent_dir)
 from AlphaZero.experiment_alphazero import run_test_multiprocess
@@ -51,7 +52,7 @@ def run_test():
         model_paths,
     )
     now = time.time()
-    scores_round, alpha_eval_time, _ = run_test_multiprocess(
+    scores_round, alpha_eval_time, _, wins_cumulative, list_scores = run_test_multiprocess(
         n_cores, opponent, num_rounds, mcts_params, model_paths, multiprocessing
     )
     print("results exp7", mcts_params)
@@ -65,7 +66,10 @@ def run_test():
         round(np.std(scores_round) / np.sqrt(len(scores_round)), 1),
         "eval_time(ms):",
         alpha_eval_time,
+        "wins_cumulative",
+        wins_cumulative,
     )
+    print("list of scores", list_scores)
 
 
 if __name__ == "__main__":

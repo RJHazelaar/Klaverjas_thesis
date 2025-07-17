@@ -6,6 +6,7 @@ import sys
 from scipy import stats
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
+
 parent_dir = os.path.dirname(os.path.realpath(os.path.join(__file__ ,"../..")))
 sys.path.append(parent_dir)
 from AlphaZero.experiment_alphazero import run_test_multiprocess
@@ -56,7 +57,7 @@ def run_test():
         model_paths,
     )
     now = time.time()
-    scores_round, alpha_eval_time, _ = run_test_multiprocess(
+    scores_round, alpha_eval_time, _, wins_cumulative, list_scores = run_test_multiprocess(
         n_cores, opponent, num_rounds, mcts_params, model_paths, multiprocessing
     )
     print("results exp6", mcts_params)
@@ -75,8 +76,11 @@ def run_test():
         "Median Abs Deviation:",
         stats.median_abs_deviation(scores_round),
         "Absolute Mean Deviation:",
-        np.mean(np.absolute(scores_round - np.mean(scores_round)))   
+        np.mean(np.absolute(scores_round - np.mean(scores_round))),
+        "wins_cumulative",
+        wins_cumulative,
     )
+    print("list of scores", list_scores)
 
 
 
