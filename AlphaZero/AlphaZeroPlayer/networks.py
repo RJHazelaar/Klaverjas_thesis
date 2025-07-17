@@ -180,7 +180,7 @@ def create_policy_nn(learning_rate, l1, l2):
         ]
     )
     # define how to train the model
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss="KLDivergence")
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate), loss="categorical_crossentropy")
     model.build(input_shape=(1, 331))
 
     return model

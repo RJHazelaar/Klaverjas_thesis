@@ -324,7 +324,7 @@ class MCTS:
         root_player = current_state.current_player
         root_info_suits = copy.deepcopy(state.can_follow_suit)
         root_highest_trumps = copy.deepcopy(state.highest_trumps)
-        current_node = MCTS_Node(team = root_team)
+        current_node = MCTS_Node(team=root_team, root=True)
         current_state.set_determinization()
 
         determinized_hands = copy.deepcopy(current_state.get_determinization())
